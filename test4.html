@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Earth's Endangered — A Global Wildlife Chronicle</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root { --bg: #030912; --fg: #e8e0d0; }
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--fg); overflow-x: hidden; font-family: 'Syne', sans-serif; cursor: none; }
+
+/* CURSOR */
+.cursor-ring {
+  position: fixed; width: 36px; height: 36px;
+  border: 1.5px solid rgba(255,255,255,0.5); border-radius: 50%;
+  pointer-events: none; z-index: 9999;
+  transform: translate(-50%,-50%);
+  transition: width 0.3s, height 0.3s, border-color 0.3s, opacity 0.3s;
+  mix-blend-mode: difference; opacity: 0;
+}
+.cursor-dot {
+  position: fixed; width: 5px; height: 5px;
+  background: white; border-radius: 50%;
+  pointer-events: none; z-index: 9999;
+  transform: translate(-50%,-50%);
+}
+
+/* HERO */
+#hero {
+  position: relative; height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+#globe-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hero-content {
+  position: relative; z-index: 5;
+  text-align: center; padding: 0 2rem;
+}
+.hero-eyebrow {
+  font-size: 0.68rem; letter-spacing: 0.55em;
+  text-transform: uppercase; color: #00e5a0;
+  margin-bottom: 1.5rem;
+  opacity: 0; animation: slideUp 1s 0.6s cubic-bezier(0.23,1,0.32,1) forwards;
+}
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3.5rem, 10vw, 9rem);
+  font-weight: 300; line-height: 0.9;
+  letter-spacing: -0.02em;
+  opacity: 0; animation: slideUp 1s 0.9s cubic-bezier(0.23,1,0.32,1) forwards;
+}
+.hero-title em { font-style: italic; color: #00e5a0; }
+.hero-desc {
+  margin-top: 2rem; max-width: 460px; margin-left: auto; margin-right: auto;
+  font-size: 0.88rem; line-height: 1.85; color: rgba(232,224,208,0.5);
+  opacity: 0; animation: slideUp 1s 1.2s cubic-bezier(0.23,1,0.32,1) forwards;
+}
+.scroll-prompt {
+  margin-top: 3.5rem; display: flex; flex-direction: column; align-items: center; gap: 0.7rem;
+  font-size: 0.62rem; letter-spacing: 0.4em; text-transform: uppercase; color: rgba(232,224,208,0.35);
+  opacity: 0; animation: slideUp 1s 1.5s cubic-bezier(0.23,1,0.32,1) forwards;
+}
+.scroll-bar {
+  width: 1px; height: 55px;
+  background: linear-gradient(to bottom, transparent, #00e5a0);
+  animation: pulseLine 2.2s ease-in-out infinite;
+}
+@keyframes pulseLine { 0%,100%{opacity:0.2} 50%{opacity:1} }
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(40px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+/* NAV DOTS */
+.nav-dots {
+  position: fixed; right: 2rem; top: 50%;
+  transform: translateY(-50%);
+  z-index: 200;
+  display: flex; flex-direction: column; gap: 13px;
+}
+.nav-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.12);
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.23,1,0.32,1);
+  position: relative;
+}
+.nav-dot::after {
+  content: attr(data-label);
+  position: absolute; right: 20px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase;
+  color: rgba(255,255,255,0.5); white-space: nowrap;
+  opacity: 0; pointer-events: none; transition: opacity 0.25s;
+}
+.nav-dot:hover::after, .nav-dot.active::after { opacity: 1; }
+.nav-dot.active {
+  background: #00e5a0; border-color: #00e5a0;
+  box-shadow: 0 0 10px #00e5a0; transform: scale(1.6);
+}
+
+/* SECTIONS */
+.c-section {
+  min-height: 100vh; position: relative;
+  display: grid; grid-template-columns: 1fr 1fr;
+  align-items: center; padding: 6rem 6vw;
+  gap: 4rem; overflow: hidden;
+}
+.c-section.flip .c-info { order: 2; }
+.c-section.flip .c-animals { order: 1; }
+
+.c-bg { position: absolute; inset: 0; z-index: 0; }
+.c-bg-orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(140px); opacity: 0.1;
+  will-change: transform;
+}
+.c-bg-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+  background-size: 65px 65px;
+}
+.c-bg-vignette {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 90% at center, transparent 30%, var(--bg) 80%);
+}
+
+/* CONTINENT INFO */
+.c-info { position: relative; z-index: 5; }
+.c-number {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13rem; font-weight: 700; line-height: 1;
+  color: rgba(255,255,255,0.025);
+  position: absolute; top: -4.5rem; left: -2rem;
+  pointer-events: none; user-select: none;
+  letter-spacing: -0.05em;
+}
+.c-label {
+  font-size: 0.62rem; letter-spacing: 0.55em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 1.25rem; opacity: 0.85;
+}
+.c-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.8rem, 5vw, 4.8rem);
+  font-weight: 300; line-height: 0.95;
+  margin-bottom: 1.75rem; letter-spacing: -0.01em;
+}
+.c-name span { display: block; }
+.c-name em { font-style: italic; color: var(--accent); }
+.c-desc {
+  font-size: 0.84rem; line-height: 1.95;
+  color: rgba(232,224,208,0.52);
+  max-width: 370px; margin-bottom: 2.75rem;
+}
+.c-stats { display: flex; gap: 2.5rem; }
+.c-stat-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.4rem; color: var(--accent); line-height: 1;
+}
+.c-stat-label {
+  font-size: 0.58rem; letter-spacing: 0.22em;
+  text-transform: uppercase; opacity: 0.35; margin-top: 0.25rem;
+}
+
+/* ANIMAL CARDS */
+.c-animals { position: relative; z-index: 5; }
+.animals-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+.a-card {
+  height: 310px; perspective: 1100px; cursor: pointer;
+}
+.a-inner {
+  width: 100%; height: 100%;
+  position: relative; transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.23,1,0.32,1);
+}
+.a-card:hover .a-inner { transform: rotateY(180deg); }
+.a-front, .a-back {
+  position: absolute; inset: 0;
+  backface-visibility: hidden; border-radius: 12px; overflow: hidden;
+}
+.a-front {
+  background: rgba(255,255,255,0.035);
+  border: 1px solid rgba(255,255,255,0.065);
+  transition: border-color 0.3s;
+}
+.a-card:hover .a-front { border-color: var(--accent); }
+.a-front img {
+  width: 100%; height: 205px;
+  object-fit: cover; display: block;
+  filter: brightness(0.75) saturate(0.85);
+  transition: filter 0.5s;
+}
+.a-card:hover .a-front img { filter: brightness(0.95) saturate(1.1); }
+.a-front-foot { padding: 0.9rem 1rem; }
+.a-front-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem; font-weight: 600; line-height: 1.2;
+}
+.a-status {
+  font-size: 0.56rem; letter-spacing: 0.2em;
+  text-transform: uppercase; margin-top: 0.35rem; opacity: 0.9;
+}
+.a-back {
+  transform: rotateY(180deg);
+  background: rgba(5,12,24,0.97);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 1.25rem 1.25rem;
+  display: flex; flex-direction: column;
+}
+.a-back-accent { width: 28px; height: 2px; background: var(--accent); margin-bottom: 0.8rem; border-radius: 1px; }
+.a-back-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem; font-weight: 600; margin-bottom: 0.2rem;
+}
+.a-back-sci { font-size: 0.6rem; font-style: italic; opacity: 0.38; margin-bottom: 0.8rem; }
+.a-back-desc { font-size: 0.7rem; line-height: 1.75; opacity: 0.7; flex: 1; }
+.a-back-stats {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;
+  margin-top: 0.8rem; padding-top: 0.8rem;
+  border-top: 1px solid rgba(255,255,255,0.055);
+}
+.a-mini-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem; color: var(--accent); line-height: 1.2;
+}
+.a-mini-key { font-size: 0.52rem; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0.38; }
+
+/* REVEAL ANIMATIONS */
+.rv {
+  opacity: 0; transform: translateY(35px);
+  transition: opacity 0.95s cubic-bezier(0.23,1,0.32,1),
+              transform 0.95s cubic-bezier(0.23,1,0.32,1);
+}
+.rv.in { opacity: 1; transform: translateY(0); }
+.rv-d1{transition-delay:0.1s} .rv-d2{transition-delay:0.2s}
+.rv-d3{transition-delay:0.3s} .rv-d4{transition-delay:0.4s}
+.rv-d5{transition-delay:0.5s} .rv-d6{transition-delay:0.6s}
+
+/* SECTION DIVIDER */
+.s-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.06), transparent);
+  margin: 0 6vw;
+}
+
+/* FOOTER */
+footer {
+  min-height: 70vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 7rem 2rem;
+  position: relative; overflow: hidden;
+}
+footer::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 60% at center, rgba(0,229,160,0.04), transparent);
+  pointer-events: none;
+}
+.footer-word {
+  position: absolute; font-family: 'Cormorant Garamond', serif;
+  font-size: 18vw; font-weight: 700;
+  color: rgba(255,255,255,0.018); letter-spacing: -0.02em;
+  pointer-events: none; user-select: none; top: 50%; left: 50%;
+  transform: translate(-50%,-50%); white-space: nowrap;
+}
+.footer-eyebrow {
+  font-size: 0.65rem; letter-spacing: 0.5em;
+  text-transform: uppercase; color: #00e5a0; margin-bottom: 1.5rem;
+  position: relative; z-index: 2;
+}
+.footer-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-weight: 300; line-height: 1.1; margin-bottom: 1.75rem;
+  position: relative; z-index: 2;
+}
+.footer-desc {
+  font-size: 0.85rem; line-height: 1.85;
+  color: rgba(232,224,208,0.38); max-width: 440px;
+  position: relative; z-index: 2;
+}
+.footer-stat {
+  margin-top: 4.5rem; position: relative; z-index: 2;
+}
+.footer-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(4rem, 8vw, 7rem); font-weight: 700;
+  color: #00e5a0; line-height: 1;
+}
+.footer-num-label {
+  font-size: 0.62rem; letter-spacing: 0.35em; text-transform: uppercase;
+  color: rgba(232,224,208,0.28); margin-top: 0.75rem;
+}
+
+/* NOISE TEXTURE OVERLAY */
+body::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none;
+  z-index: 1000; opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* MOBILE */
+@media (max-width: 900px) {
+  .c-section { grid-template-columns: 1fr; padding: 5rem 5vw; gap: 3rem; }
+  .c-section.flip .c-info { order: 1; }
+  .c-section.flip .c-animals { order: 2; }
+  .animals-grid { grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+  .a-card { height: 260px; }
+  .a-front img { height: 165px; }
+  .nav-dots { display: none; }
+  .c-number { font-size: 8rem; }
+}
+@media (max-width: 500px) {
+  .animals-grid { grid-template-columns: 1fr; }
+  .a-card { height: 300px; }
+}
+</style>
+</head>
+<body>
+
+<div class="cursor-ring" id="cursor-ring"></div>
+<div class="cursor-dot" id="cursor-dot"></div>
+
+<!-- NAV -->
+<nav class="nav-dots" id="nav-dots">
+  <div class="nav-dot active" data-target="hero" data-label="Home"></div>
+  <div class="nav-dot" data-target="africa" data-label="Africa"></div>
+  <div class="nav-dot" data-target="asia" data-label="Asia"></div>
+  <div class="nav-dot" data-target="europe" data-label="Europe"></div>
+  <div class="nav-dot" data-target="north-america" data-label="North America"></div>
+  <div class="nav-dot" data-target="south-america" data-label="South America"></div>
+  <div class="nav-dot" data-target="oceania" data-label="Oceania"></div>
+  <div class="nav-dot" data-target="antarctica" data-label="Antarctica"></div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="globe-canvas"></canvas>
+  <div class="hero-content">
+    <p class="hero-eyebrow">A Global Wildlife Chronicle</p>
+    <h1 class="hero-title">Earth's<br><em>Endangered</em></h1>
+    <p class="hero-desc">7 continents. 21 species on the edge. One urgent story — about the animals we stand to lose forever, and the world we'd leave behind.</p>
+    <div class="scroll-prompt">
+      <div class="scroll-bar"></div>
+      <span>Scroll to Explore</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ AFRICA ═══ -->
+<div class="s-divider"></div>
+<section class="c-section" id="africa" style="--accent:#E5813A;">
+  <div class="c-bg">
+    <div class="c-bg-orb" style="width:700px;height:700px;background:#E5813A;right:-250px;top:50%;transform:translateY(-50%);"></div>
+    <div class="c-bg-grid"></div>
+    <div class="c-bg-vignette"></div>
+  </div>
+  <div class="c-info">
+    <div class="c-number">01</div>
+    <p class="c-label rv">Continent 01</p>
+    <h2 class="c-name rv rv-d1"><span>The</span><em>Ancient</em><span>Land</span></h2>
+    <p class="c-desc rv rv-d2">The cradle of life, where 1,100+ mammal species roam savannahs, rainforests, and deserts. Habitat loss, poaching, and climate change threaten animals that have walked this land for millennia.</p>
+    <div class="c-stats rv rv-d3">
+      <div><div class="c-stat-num">1,100+</div><div class="c-stat-label">Mammal Species</div></div>
+      <div><div class="c-stat-num">2,000+</div><div class="c-stat-label">Threatened Species</div></div>
+    </div>
+  </div>
+  <div class="c-animals">
+    <div class="animals-grid">
+      <div class="a-card rv rv-d2">
+        <div class="a-inner">
+          <div class="a-front">
+            <img src="https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=400&q=80" alt="Mountain Gorilla" onerror="this.src='https://picsum.photos/seed/gorilla/400/300'">
+            <div class="a-front-foot">
+              <div class="a-front-name">Mountain Gorilla</div>
+              <div class="a-status" style="color:#ff6b35;">● Endangered</div>
+            </div>
+          </div>
+          <div class="a-back">
+            <div class="a-back-accent"></div>
+            <div class="a-back-name">Mountain Gorilla</div>
+            <div class="a-back-sci">Gorilla beringei beringei</div>
+            <div class="a-back-desc">Living in the misty forests of Virunga volcanoes, these gentle giants share 98.3% of our DNA. Conservation efforts have grown their numbers from 620 in 1989 to over 1,000 today — a rare success story.</div>
+            <div class="a-back-stats">
+              <div><div class="a-mini-val">~1,063</div><div class="a-mini-key">Wild Population</div></div>
+              <div><div class="a-mini-val">Poaching</div><div class="a-mini-key">Main Threat</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="a-card rv rv-d3">
+        <div class="a-inner">
+          <div class="a-front">
+            <img src="https://images.unsplash.com/photo-1474511320723-9a56873867b5?w=400&q=80" alt="African Elephant" onerror="this.src='https://picsum.photos/seed/elephant/400/300'">
+            <div class="a-front-foot">
+              <div class="a-front-name">African Elephant</div>
+              <div class="a-status" style="color:#f5a623;">● Vulnerable</div>
+            </div>
+          </div>
+          <div class="a-back">
+            <div class="a-back-accent"></div>
+            <div class="a-back-name">African Elephant</div>
+            <div class="a-back-sci">Loxodonta africana</div>
+            <div class="a-back-desc">Earth's largest land animal is a keystone species — digging waterholes, clearing forest paths, dispersing seeds. Illegal ivory trade has devastated populations across the continent.</div>
+            <div class="a-back-stats">
+              <div><div class="a-mini-val">~415K</div><div class="a-mini-key">Wild Population</div></div>
+              <div><div class="a-mini-val">Ivory Trade</div><div class="a-mini-key">Main Threat</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="a-card rv rv-d4">
+        <div class="a-inner">
+          <div class="a-front">
+            <img src="https://images.unsplash.com/photo-1501706362039-c06b2d715385?w=400&q=80" alt="Black Rhinoceros" onerror="this.src='https://picsum.photos/seed/rhinoceros/400/300'">
+            <div class="a-front-foot">
+              <div class="a-front-name">Black Rhinoceros</div>
+              <div class="a-status" style="color:#d0021b;">● Critically Endangered</div>
+            </div>
+          </div>
+          <div class="a-back">
+            <div class="a-back-accent"></div>
+            <div class="a-back-name">Black Rhinoceros</div>
+            <div class="a-back-sci">Diceros bicornis</div>
+            <div class="a-back-desc">Once numbering 70,000 in 1970, poaching reduced black rhinos to just 2,400 by 1995 — a 97% collapse. Their horns are worth more than gold by weight in illegal markets across Asia.</div>
+            <div class="a-back-stats">
+              <div><div class="a-mini-val">~6,195</div><div class="a-mini-key">Wild Population</div></div>
+              <div><div class="a-mini-val">Horn Poaching</div><div class="a-mini-key">Main Threat</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ASIA ═══ -->
+<div class="s-divider"></div>
+<section class="c-section flip" id="asia" style="--accent:#E84A5F;">
+  <div class="c-bg">
+    <div class="c-bg-orb" style="width:750px;height:750px;background:#E84A5F;left:-280px;top:50%;transform:translateY(-50%);"></div>
+    <div class="c-bg-grid"></div>
+    <div class="c-bg-vignette"></div>
+  </div>
+  <div class="c-info">
+    <div class="c-number">02</div>
+    <p class="c-label rv">Continent 02</p>
+    <h2 class="c-name rv rv-d1"><span>Land of</span><em>Vanishing</em><span>Giants</span></h2>
+    <p class="c-desc rv rv-d2">From Himalayan peaks to equatorial rainforests, Asia harbors extraordinary biodiversity under extreme pressure from the world's largest human population and rampant illegal wildlife trafficking.</p>
+    <div class="c-stats rv rv-d3">
+      <div><div class="c-stat-num">70%</div><div class="c-stat-label">Habitat Destroyed</div></div>
+      <div><div class="c-stat-num">750+</div><div class="c-stat-label">Threatened Species</div></div>
+    </div>
+  </div>
+  <div class="c-animals">
+    <div class="animals-grid">
+      <div class="a-card rv rv-d2">
+        <div class="a-inner">
+          <div class="a-front">
+            <img src="https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?w=400&q=80" alt="Amur Leopard" onerror="this.src='https://picsum.photos/seed/leopard/400/300'">
+            <div class="a-front-foot">
+              <div class="a-front-name">Amur Leopard</div>
+              <div class="a-status" style="color:#d0021b;">● Critically Endangered</div>
+            </div>
+          </div>
+          <div class="a-back">
+            <div class="a-back-accent"></div>
+            <div class="a-back-name">Amur Leopard</div>
+            <div class="a-back-sci">Panthera pardus orientalis</div>
+            <div class="a-back-desc">The world's rarest big cat, surviving in the cold temperate forests of the Russian Far East. Once nearly extinct at only 30 individuals, intensive conservation has doubled numbers to ~100 — still perilously low.</div>
+            <div class="a-back-stats">
+              <div><div class="a-mini-val">~100</div><div class="a-mini-key">Wild Population</div></div>
+              <div><div class="a-mini-val">Poaching</div><div class="a-mini-key">Main Threat</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="a-card rv rv-d3">
+        <div class="a-inner">
+          <div class="a-front">
+            <img src="https://images.unsplash.com/photo-1575550959106-5a7defe28b56?w=400&q=80" alt="Sumatran Orangutan" onerror="this.src='https://picsum.photos/seed/orangutan/400/300'">
+            <div class="a-front-foot">
+              <div class="a-front-name">Sumatran Orangutan</div>
+              <div class="a-status" style="color:#d0021b;">● Critically Endangered</div>
+            </div>
+          </div>
+          <div class="a-back">
+            <div class="a-back-accent"></div>
+            <div class="a-back-name">Sumatran Orangutan</div>
+            <div class="a-back-sci">Pongo abelii</div>
+            <div class="a-back-desc">The "person of the forest" shares 97% of human DNA. Found only in Sumatra, their rainforest home is being razed for palm oil plantations at catastrophic speed — erasing their world acre by acre.</div>
+            <div class="a-back-stats">
+              <div><div class="a-mini-val">~14,000</div><div class="a-mini-key">Wild Population</div></div>
+              <div><div class="a-mini-val">Deforestation</div><div class="a-mini-key">Main Threat</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="a-card rv rv-d4">
+        <div class="a-inner">
+          <div class="a-front">
+            <img src="https://images.unsplash.com/photo-1617791160536-598cf32026fb?w=400&q=80" alt="Snow Leopard" onerror="this.src='https://picsum.photos/seed/snowleopard/400/300'">
+            <div class="a-front-foot">
+              <div class="a-front-name">Snow Leopard</div>
+              <div class="a-status" style="color:#f5a623;">● Vulnerable</div>
+            </div>
+          </div>
+          <div class="a-back">
+            <div class="a-back-accent"></div>
+            <div class="a-back-name">Snow Leopard</div>
+            <div class="a-back-sci">Panthera uncia</div>
+            <div class="a-back-desc">Ghost of the mountains — ranging across 12 countries of Central Asia at altitudes above 3,000m. Their thick spotted coats provide perfect camouflage in rocky terrain, making them nearly impossible to spot in the wild.</div>
+            <div class="a-back-stats">
+              <div><div class="a-mini-val">~4,000</div><div class="a-mini-key">Wild Population</div></div>
+              <div><div class="a-mini-val">Climate Change</div><div class="a-mini-key">Main Threat</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ EUROPE ═══ -->
+<div class="s-divider"></div>
+<section class="c-section" id="europe" style="--accent:#4A90E2;">
+  <div class="c-bg">
+    <div class="c-bg-orb" style="width:700px;height:700px;background:#4A90E2;right:-250px;top:50%;transform:translateY(-50%);"></div>
+    <div class="c-bg-grid"></div>
+    <div class="c-bg-vignette"></div>
+  </div>
+  <div class="c-info">
+    <div class="c-number">03</div>
+    <p class="c-label rv">Continent 03</p>
+    <h2 class="c-name rv rv-d1"><span>The</span><em>Forgotten</em><span>Wilderness</span></h2>
+    <p class="c-desc rv rv-d2">Europe's dense human footprint has reduced wildlife to fragments. Yet remarkable conservation successes — from Iberian lynx to European bison — prove that with will and resources, species can claw back from the edge.</p>
+    <div class="c-stats rv rv-d3">
+      <div><div class="c-stat-num">500+</div><div class="c-stat-label">Species Threatened</div></div>
+      <div><div class="c-stat-num">40%</div><div class="c-stat-label">Habitat Fragmented</div></div>
+    </div>
+  </div>
+  <div class="c-animals">
+    <div class="animals-grid">
+      <div class="a-card rv rv-d2">
+        <div class="a-inner">
+          <div class="a-front">
+            <img src="https://images.unsplash.com/photo-1548767797-d8c844163c4a?w=400&q=80" alt="Iberian Lynx" onerror="this.src='https://picsum.photos/seed/iberianlynx/400/300'">
+            <div class="a-front-foot">
+              <div class="a-front-name">Iberian Lynx</div>
+              <div class="a-status" style="color:#f5a623;">● Endangered</div>
+            </div>
+          </div>
+          <div class="a-back">
+            <div class="a-back-accent"></div>
+            <div class="a-back-name">Iberian Lynx</div>
+            <div class="a-back-sci">Lynx pardinus</div>
+            <div class="a-back-desc">Once the world's most endangered feline — down to just 94 individuals in 2002. A landmark breeding and reintroduction program has grown numbers to 1,000+, a genuine conservation triumph in Spain and Portugal.</div>
+            <div class="a-back-stats">
+              <div><div class="a-mini-val">~1,000+</div><div class="a-mini-key">Wild Population</div></div>
+              <div><div class="a-mini-val">Habitat Loss</div><div class="a-mini-key">Main Threat</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="a-card rv rv-d3">
+        <div class="a-inner">
+          <div class="a-front">
+            <img src="https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=400&q=80" alt="European Bison" onerror="this.src='https://picsum.photos/seed/bison/400/300'">
+            <div class="a-front-foot">
+              <div class="a-front-name">European Bison</div>
+              <div class="a-status" style="color:#f5a623;">● Near Threatened</div>
+            </div>
+          </div>
+          <div class="a-back">
+            <div class="a-back-accent"></div>
+            <div class="a-back-name">European Bison</div>
+            <div class="a-back-sci">Bison bonasus</div>
+            <div class="a-back-desc">Europe's heaviest land animal went extinct in the wild in 1927. Bred entirely from 12 captive individuals, its remarkable recovery to 7,000+ animals across Poland and Belarus is conservation history.</div>
+            <div class="a-back-stats">
+              <div><div class="a-mini-val">~7,000</div><div class="a-mini-key">Wild Population</div></div>
+              <div><div class="a-mini-val">Inbreeding</div><div class="a-mini-key">Main Threat</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="a-card rv rv-d4">
+        <div class="a-inner">
+          <div class="a-front">
+            <img src="https://images.unsplash.com/photo-1612024782955-49fae79e42bb?w=400&q=80" alt="Mediterranean Monk Seal" onerror="this.src='https://picsum.photos/seed/monkseal/400/300'">
+            <div class="a-front-foot">
+              <div class="a-front-name">Mediterranean Monk Seal</div>
+              <div class="a-status" style="color:#d0021b;">● Endangered</div>
+            </div>
+          </div>
+          <div class="a-back">
+            <div class="a-back-accent"></div>
+            <div class="a-back-name">Mediterranean Monk Seal</div>
+            <div class="a-back-sci">Monachus monachus</div>
+            <div class="a-back-desc">One of the world's rarest marine mammals, once abundant throughout the Mediterranean. Now only ~700 survive in scattered isolated colonies, threatened by fishing nets, tourist disturbance, and plastic pollution.</div>
+            <div class="a-back-stats">
+              <div><div class="a-mini-val">~700</div><div class="a-mini-key">Wild Population</div></div>
+              <div><div class="a-mini-val">Bycatch/Nets</div><div class="a-mini-key">Main Threat</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ NORTH AMERICA ═══ -->
+<div class="s-divider"></div>
+<section class="c-section flip" id="north-america" style="--accent:#9B59B6;">
+  <div class="c-bg">
+    <div class="c-bg-orb" style="width:750px;height:750px;background:#9B59B6;left:-280px;top:50%;transform:translateY(-50%);"></div>
+    <div class="c-bg-grid"></div>
+    <div class="c-bg-vignette"></div>
+  </div>
+  <div class="c-info">
+    <div class="c-number">04</div>
+    <p class="c-label rv">Continent 04</p>
+    <h2 class="c-name rv rv-d1"><span>Where</span><em>Wild</em><span>Was Born</span></h2>
+    <p class="c-desc rv rv-d2">North America once teemed with megafauna and thundering herds. Today, urban sprawl, pollution, and climate change push species to islands of habitat. Yet some of conservation's greatest triumphs happened here.</p>
+    <div class="c-stats rv rv-d3">
+      <div><div class="c-stat-num">1,300+</div><div class="c-stat-label">At-Risk Species</div></div>
+      <div><div class="c-stat-num">85%</div><div class="c-stat-label">Wetlands Drained</div></div>
+    </div>
+  </div>
+  <div class="c-animals">
+    <div class="animals-grid">
+      <div class="a-card rv rv-d2">
+        <div class="a-inner">
+          <div class="a-front">
+            <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&q=80" alt="California Condor" onerror="this.src='https://picsum.photos/seed/condor/400/300'">
+            <div class="a-front-foot">
+              <div class="a-front-name">California Condor</div>
+              <div class="a-status" style="color:#d0021b;">● Critically Endangered</div>
+            </div>
+          </div>
+          <div class="a-back">
+            <div class="a-back-accent"></div>
+            <div class="a-back-name">California Condor</div>
+            <div class="a-back-sci">Gymnogyps californianus</div>
+            <div class="a-back-desc">North America's largest flying bird with a 9.5-foot wingspan was down to just 27 individuals in 1987. All were captured for an intensive breeding program. Today, 500+ soar free over California and Baja California.</div>
+            <div class="a-back-stats">
+              <div><div class="a-mini-val">~500+</div><div class="a-mini-key">Wild Population</div></div>
+              <div><div class="a-mini-val">Lead Poisoning</div><div class="a-mini-key">Main Threat</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="a-card rv rv-d3">
+        <div class="a-inner">
+          <div class="a-front">
+            <img src="https://images.unsplash.com/photo-1603316851229-5a5f0d26effd?w=400&q=80" alt="Florida Panther" onerror="this.src='https://picsum.photos/seed/panther/400/300'">
+            <div class="a-front-foot">
+              <div class="a-front-name">Florida Panther</div>
+              <div class="a-status" style="color:#d0021b;">● Critically Endangered</div>
+            </div>
+          </div>
+          <div class="a-back">
+            <div class="a-back-accent"></div>
+            <div class="a-back-name">Florida Panther</div>
+            <div class="a-back-sci">Puma concolor coryi</div>
+            <div class="a-back-desc">America's most endangered cat, reduced to 20–30 animals by the 1990s through habitat loss and severe inbreeding. An innovative genetic rescue introduced Texas pumas, revitalizing the population to 200+ animals.</div>
+            <div class="a-back-stats">
+              <div><div class="a-mini-val">~200</div><div class="a-mini-key">Wild Population</div></div>
+              <div><div class="a-mini-val">Road Collisions</div><div class="a-mini-key">Main Threat</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="a-card rv rv-d4">
+        <div class="a-inner">
+          <div class="a-front">
+            <img src="https://images.unsplash.com/photo-1568430462989-44163eb1752f?w=400&q=80" alt="North Atlantic Right Whale" onerror="this.src='https://picsum.photos/seed/rightwhale/400/300'">
+            <div class="a-front-foot">
+              <div class="a-front-name">N. Atlantic Right Whale</div>
+              <div class="a-status" style="color:#d0021b;">● Critically Endangered</div>
+            </div>
+          </div>
+          <div class="a-back">
+            <div class="a-back-accent"></div>
+            <div class="a-back-name">N. Atlantic Right Whale</div>
+            <div class="a-back-sci">Eubalaena glacialis</div>
+            <div class="a-back-desc">Named by whalers as the "right" whale to hunt, they were nearly gone by 1900. Today fewer than 360 remain — and their population is still declining due to ship strikes and entanglement in fishing gear.</div>
+            <div class="a-back-stats">
+              <div><div class="a-mini-val">&lt;360</div><div class="a-mini-key">Wild Population</div></div>
+              <div><div class="a-mini-val">Ship Strikes</div><div class="a-mini-key">Main Threat</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SOUTH AMERICA ═══ -->
+<div class="s-divider"></div>
+<section class="c-section" id="south-america" style="--accent:#27AE60;">
+  <div class="c-bg">
+    <div class="c-bg-orb" style="width:700px;height:700px;background:#27AE60;right:-250px;top:50%;transform:translateY(-50%);"></div>
+    <div class="c-bg-grid"></div>
+    <div class="c-bg-vignette"></div>
+  </div>
+  <div class="c-info">
+    <div class="c-number">05</div>
+    <p class="c-label rv">Continent 05</p>
+    <h2 class="c-name rv rv-d1"><span>The</span><em>Burning</em><span>Emerald</span></h2>
+    <p class="c-desc rv rv-d2">Home to the Amazon — Earth's greatest reservoir of biodiversity. South America loses millions of acres of irreplaceable rainforest annually. The creatures living here have no other home anywhere on Earth.</p>
+    <div class="c-stats rv rv-d3">
+      <div><div class="c-stat-num">40K+</div><div class="c-stat-label">Plant Species</div></div>
+      <div><div class="c-stat-num">17M</div><div class="c-stat-label">Acres Burned/Year</div></div>
+    </div>
+  </div>
+  <div class="c-animals">
+    <div class="animals-grid">
+      <div class="a-card rv rv-d2">
+        <div class="a-inner">
+          <div class="a-front">
+            <img src="https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=400&q=80" alt="Jaguar" onerror="this.src='https://picsum.photos/seed/jaguar/400/300'">
+            <div class="a-front-foot">
+              <div class="a-front-name">Jaguar</div>
+              <div class="a-status" style="color:#f5a623;">● Near Threatened</div>
+            </div>
+          </div>
+          <div class="a-back">
+            <div class="a-back-accent"></div>
+            <div class="a-back-name">Jaguar</div>
+            <div class="a-back-sci">Panthera onca</div>
+            <div class="a-back-desc">Apex predator of the Americas and sacred symbol of Amazonian civilizations. Jaguars have lost over 50% of their historic range as deforestation fragments the Amazon into isolated, shrinking islands of habitat.</div>
+            <div class="a-back-stats">
+              <div><div class="a-mini-val">~64,000</div><div class="a-mini-key">Wild Population</div></div>
+              <div><div class="a-mini-val">Deforestation</div><div class="a-mini-key">Main Threat</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="a-card rv rv-d3">
+        <div class="a-inner">
+          <div class="a-front">
+            <img src="https://images.unsplash.com/photo-1551085254-e96b210db58a?w=400&q=80" alt="Giant Anteater" onerror="this.src='https://picsum.photos/seed/anteater/400/300'">
+            <div class="a-front-foot">
+              <div class="a-front-name">Giant Anteater</div>
+              <div class="a-status" style="color:#f5a623;">● Vulnerable</div>
+            </div>
+          </div>
+          <div class="a-back">
+            <div class="a-back-accent"></div>
+            <div class="a-back-name">Giant Anteater</div>
+            <div class="a-back-sci">Myrmecophaga tridactyla</div>
+            <div class="a-back-desc">This ancient creature eats 35,000 ants per day using a tongue longer than its head. A crucial regulator of insect populations, giant anteaters have been eradicated from much of their range by agricultural wildfires.</div>
+            <div class="a-back-stats">
+              <div><div class="a-mini-val">~5,000</div><div class="a-mini-key">Wild Population</div></div>
+              <div><div class="a-mini-val">Wildfires</div><div class="a-mini-key">Main Threat</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="a-card rv rv-d4">
+        <div class="a-inner">
+          <div class="a-front">
+            <img src="https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=400&q=80" alt="Amazon River Dolphin" onerror="this.src='https://picsum.photos/seed/riverdolphin/400/300'">
+            <div class="a-front-foot">
+              <div class="a-front-name">Amazon River Dolphin</div>
+              <div class="a-status" style="color:#f5a623;">● Endangered</div>
+            </div>
+          </div>
+          <div class="a-back">
+            <div class="a-back-accent"></div>
+            <div class="a-back-name">Amazon River Dolphin</div>
+            <div class="a-back-sci">Inia geoffrensis</div>
+            <div class="a-back-desc">The mythical pink boto of Amazonian legend, turning coral-pink as it ages. Mercury from illegal gold mining bioaccumulates in their tissue while overfishing depletes the fish they depend on throughout the river system.</div>
+            <div class="a-back-stats">
+              <div><div class="a-mini-val">Unknown</div><div class="a-mini-key">Wild Population</div></div>
+              <div><div class="a-mini-val">Mercury/Nets</div><div class="a-mini-key">Main Threat</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ OCEANIA ═══ -->
+<div class="s-divider"></div>
+<section class="c-section flip" id="oceania" style="--accent:#F39C12;">
+  <div class="c-bg">
+    <div class="c-bg-orb" style="width:750px;height:750px;background:#F39C12;left:-280px;top:50%;transform:translateY(-50%);"></div>
+    <div class="c-bg-grid"></div>
+    <div class="c-bg-vignette"></div>
+  </div>
+  <div class="c-info">
+    <div class="c-number">06</div>
+    <p class="c-label rv">Continent 06</p>
+    <h2 class="c-name rv rv-d1"><span>The</span><em>Island</em><span>of Time</span></h2>
+    <p class="c-desc rv rv-d2">Australia and Oceania evolved in isolation for 45 million years, producing creatures found nowhere else on Earth. Now invasive species, drought, and catastrophic wildfires tear through ecosystems with no evolutionary defense.</p>
+    <div class="c-stats rv rv-d3">
+      <div><div class="c-stat-num">84%</div><div class="c-stat-label">Endemic Mammals</div></div>
+      <div><div class="c-stat-num">3B+</div><div class="c-stat-label">Animals Lost in 2019–20 Fires</div></div>
+    </div>
+  </div>
+  <div class="c-animals">
+    <div class="animals-grid">
+      <div class="a-card rv rv-d2">
+        <div class="a-inner">
+          <div class="a-front">
+            <img src="https://images.unsplash.com/photo-1459262838948-3e2de6c1ec80?w=400&q=80" alt="Koala" onerror="this.src='https://picsum.photos/seed/koala/400/300'">
+            <div class="a-front-foot">
+              <div class="a-front-name">Koala</div>
+              <div class="a-status" style="color:#d0021b;">● Endangered</div>
+            </div>
+          </div>
+          <div class="a-back">
+            <div class="a-back-accent"></div>
+            <div class="a-back-name">Koala</div>
+            <div class="a-back-sci">Phascolarctos cinereus</div>
+            <div class="a-back-desc">Once 10 million strong, koala populations have collapsed under the combined assault of habitat clearing, chlamydia disease, drought, and wildfire — losing 30% of their population in the 2019–20 bushfire season alone.</div>
+            <div class="a-back-stats">
+              <div><div class="a-mini-val">~92,000</div><div class="a-mini-key">Wild Population</div></div>
+              <div><div class="a-mini-val">Wildfires/Disease</div><div class="a-mini-key">Main Threat</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="a-card rv rv-d3">
+        <div class="a-inner">
+          <div class="a-front">
+            <img src="https://images.unsplash.com/photo-1535083783855-aaab7a2a8c88?w=400&q=80" alt="Tasmanian Devil" onerror="this.src='https://picsum.photos/seed/tasmaniandevil/400/300'">
+            <div class="a-front-foot">
+              <div class="a-front-name">Tasmanian Devil</div>
+              <div class="a-status" style="color:#f5a623;">● Endangered</div>
+            </div>
+          </div>
+          <div class="a-back">
+            <div class="a-back-accent"></div>
+            <div class="a-back-name">Tasmanian Devil</div>
+            <div class="a-back-sci">Sarcophilus harrisii</div>
+            <div class="a-back-desc">World's largest carnivorous marsupial, devastated by Devil Facial Tumor Disease — a contagious cancer spread through biting that kills within months. Since 1996, DFTD has eliminated 80% of the population.</div>
+            <div class="a-back-stats">
+              <div><div class="a-mini-val">~25,000</div><div class="a-mini-key">Wild Population</div></div>
+              <div><div class="a-mini-val">Facial Tumor</div><div class="a-mini-key">Main Threat</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="a-card rv rv-d4">
+        <div class="a-inner">
+          <div class="a-front">
+            <img src="https://images.unsplash.com/photo-1560711845-4d0f49c3ea7b?w=400&q=80" alt="Kakapo" onerror="this.src='https://picsum.photos/seed/kakapo/400/300'">
+            <div class="a-front-foot">
+              <div class="a-front-name">Kākāpō</div>
+              <div class="a-status" style="color:#d0021b;">● Critically Endangered</div>
+            </div>
+          </div>
+          <div class="a-back">
+            <div class="a-back-accent"></div>
+            <div class="a-back-name">Kākāpō</div>
+            <div class="a-back-sci">Strigops habroptila</div>
+            <div class="a-back-desc">The world's only flightless parrot — nocturnal, moss-green, and ancient. Every single individual is named and personally monitored by conservationists. Down to 51 birds in 1995, intensive efforts have grown numbers to ~250.</div>
+            <div class="a-back-stats">
+              <div><div class="a-mini-val">~250</div><div class="a-mini-key">Wild Population</div></div>
+              <div><div class="a-mini-val">Invasive Predators</div><div class="a-mini-key">Main Threat</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ANTARCTICA ═══ -->
+<div class="s-divider"></div>
+<section class="c-section" id="antarctica" style="--accent:#81E4F5;">
+  <div class="c-bg">
+    <div class="c-bg-orb" style="width:700px;height:700px;background:#81E4F5;right:-250px;top:50%;transform:translateY(-50%);"></div>
+    <div class="c-bg-grid"></div>
+    <div class="c-bg-vignette"></div>
+  </div>
+  <div class="c-info">
+    <div class="c-number">07</div>
+    <p class="c-label rv">Continent 07</p>
+    <h2 class="c-name rv rv-d1"><span>The</span><em>Melting</em><span>Frontier</span></h2>
+    <p class="c-desc rv rv-d2">Antarctica is warming three times faster than the global average. The creatures that evolved for extreme cold have nowhere colder to go — as sea ice disappears at unprecedented rates and krill populations collapse.</p>
+    <div class="c-stats rv rv-d3">
+      <div><div class="c-stat-num">+3°C</div><div class="c-stat-label">Warming Since 1950</div></div>
+      <div><div class="c-stat-num">40%</div><div class="c-stat-label">Krill Population Decline</div></div>
+    </div>
+  </div>
+  <div class="c-animals">
+    <div class="animals-grid">
+      <div class="a-card rv rv-d2">
+        <div class="a-inner">
+          <div class="a-front">
+            <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80" alt="Emperor Penguin" onerror="this.src='https://picsum.photos/seed/penguin/400/300'">
+            <div class="a-front-foot">
+              <div class="a-front-name">Emperor Penguin</div>
+              <div class="a-status" style="color:#f5a623;">● Vulnerable</div>
+            </div>
+          </div>
+          <div class="a-back">
+            <div class="a-back-accent"></div>
+            <div class="a-back-name">Emperor Penguin</div>
+            <div class="a-back-sci">Aptenodytes forsteri</div>
+            <div class="a-back-desc">The tallest penguin, uniquely adapted to breed in Antarctic winter at −40°C. As sea ice melts weeks earlier each year, colonies catastrophically collapse when eggs and chicks are drowned before they can survive.</div>
+            <div class="a-back-stats">
+              <div><div class="a-mini-val">~600K</div><div class="a-mini-key">Wild Population</div></div>
+              <div><div class="a-mini-val">Sea Ice Loss</div><div class="a-mini-key">Main Threat</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="a-card rv rv-d3">
+        <div class="a-inner">
+          <div class="a-front">
+            <img src="https://images.unsplash.com/photo-1551244072-5d12893278bc?w=400&q=80" alt="Leopard Seal" onerror="this.src='https://picsum.photos/seed/leopardseal/400/300'">
+            <div class="a-front-foot">
+              <div class="a-front-name">Leopard Seal</div>
+              <div class="a-status" style="color:#2ECC71;">● Least Concern</div>
+            </div>
+          </div>
+          <div class="a-back">
+            <div class="a-back-accent"></div>
+            <div class="a-back-name">Leopard Seal</div>
+            <div class="a-back-sci">Hydrurga leptonyx</div>
+            <div class="a-back-desc">Antarctica's apex marine predator, solitary and fearsome. While currently stable, leopard seals depend on krill-eating species — penguin, fish, squid — whose populations are under accelerating pressure from warming oceans.</div>
+            <div class="a-back-stats">
+              <div><div class="a-mini-val">~220K</div><div class="a-mini-key">Wild Population</div></div>
+              <div><div class="a-mini-val">Ocean Warming</div><div class="a-mini-key">Main Threat</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="a-card rv rv-d4">
+        <div class="a-inner">
+          <div class="a-front">
+            <img src="https://images.unsplash.com/photo-1516934024742-b461fba47600?w=400&q=80" alt="Antarctic Blue Whale" onerror="this.src='https://picsum.photos/seed/bluewhale/400/300'">
+            <div class="a-front-foot">
+              <div class="a-front-name">Antarctic Blue Whale</div>
+              <div class="a-status" style="color:#d0021b;">● Critically Endangered</div>
+            </div>
+          </div>
+          <div class="a-back">
+            <div class="a-back-accent"></div>
+            <div class="a-back-name">Antarctic Blue Whale</div>
+            <div class="a-back-sci">Balaenoptera musculus intermedia</div>
+            <div class="a-back-desc">Earth's largest animal ever — up to 30m long, 200 tonnes. Hunted to near-extinction in the 20th century, with less than 1% of original numbers surviving. After 50+ years of protection, only ~2,000 remain in Antarctic waters.</div>
+            <div class="a-back-stats">
+              <div><div class="a-mini-val">~2,000</div><div class="a-mini-key">Wild Population</div></div>
+              <div><div class="a-mini-val">Krill Decline</div><div class="a-mini-key">Main Threat</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<div class="s-divider"></div>
+<footer>
+  <div class="footer-word">ENDANGERED</div>
+  <p class="footer-eyebrow rv">The Time to Act Is Now</p>
+  <h2 class="footer-title rv rv-d1">Every Species Lost<br>Is a Story Ended<br><em style="color:#00e5a0;font-style:italic;">Forever</em></h2>
+  <p class="footer-desc rv rv-d2">These 21 animals represent thousands of species on the edge. The decisions made in the next decade will determine what kind of planet future generations inherit.</p>
+  <div class="footer-stat rv rv-d3">
+    <div class="footer-num">1,000,000+</div>
+    <div class="footer-num-label">Species Currently Threatened With Extinction — IPBES 2024</div>
+  </div>
+</footer>
+
+<!-- THREE.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ═══ CURSOR ═══
+const ring = document.getElementById('cursor-ring');
+const dot = document.getElementById('cursor-dot');
+let mx = 0, my = 0, rx = 0, ry = 0, cursorVisible = false;
+
+document.addEventListener('mousemove', (e) => {
+  mx = e.clientX; my = e.clientY;
+  dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+  if (!cursorVisible) { ring.style.opacity = '1'; cursorVisible = true; }
+});
+
+(function animCursor() {
+  rx += (mx - rx) * 0.1;
+  ry += (my - ry) * 0.1;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(animCursor);
+})();
+
+document.querySelectorAll('.a-card, .nav-dot').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    ring.style.width = '65px'; ring.style.height = '65px';
+    ring.style.borderColor = 'rgba(0,229,160,0.7)';
+  });
+  el.addEventListener('mouseleave', () => {
+    ring.style.width = '36px'; ring.style.height = '36px';
+    ring.style.borderColor = 'rgba(255,255,255,0.5)';
+  });
+});
+
+// ═══ THREE.JS GLOBE ═══
+const canvas = document.getElementById('globe-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 200);
+camera.position.z = 2.8;
+
+// Stars
+const starGeo = new THREE.BufferGeometry();
+const starCount = 5000;
+const sPos = new Float32Array(starCount * 3);
+for (let i = 0; i < starCount * 3; i++) sPos[i] = (Math.random() - 0.5) * 80;
+starGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3));
+const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.05, transparent: true, opacity: 0.6 });
+scene.add(new THREE.Points(starGeo, starMat));
+
+// Globe wireframe
+const globeGeo = new THREE.IcosahedronGeometry(1, 10);
+const globeMat = new THREE.MeshBasicMaterial({ color: 0x00e5a0, wireframe: true, transparent: true, opacity: 0.1 });
+const globe = new THREE.Mesh(globeGeo, globeMat);
+scene.add(globe);
+
+// Inner dark sphere
+const innerMat = new THREE.MeshBasicMaterial({ color: 0x030912, transparent: true, opacity: 0.85 });
+scene.add(new THREE.Mesh(new THREE.SphereGeometry(0.98, 32, 32), innerMat));
+
+// Glow atmosphere
+const atmGeo = new THREE.SphereGeometry(1.18, 32, 32);
+const atmMat = new THREE.MeshBasicMaterial({ color: 0x00e5a0, transparent: true, opacity: 0.04, side: THREE.BackSide });
+const atm = new THREE.Mesh(atmGeo, atmMat);
+scene.add(atm);
+
+// Surface particles (Fibonacci sphere)
+const pGeo = new THREE.BufferGeometry();
+const pCount = 2500;
+const pp = new Float32Array(pCount * 3);
+for (let i = 0; i < pCount; i++) {
+  const phi = Math.acos(1 - 2 * (i + 0.5) / pCount);
+  const theta = Math.PI * (1 + Math.sqrt(5)) * i;
+  pp[i*3] = Math.sin(phi) * Math.cos(theta);
+  pp[i*3+1] = Math.sin(phi) * Math.sin(theta);
+  pp[i*3+2] = Math.cos(phi);
+}
+pGeo.setAttribute('position', new THREE.BufferAttribute(pp, 3));
+const pMat = new THREE.PointsMaterial({ color: 0x00e5a0, size: 0.018, transparent: true, opacity: 0.5 });
+const surfPts = new THREE.Points(pGeo, pMat);
+scene.add(surfPts);
+
+// Orbital ring
+const ringGeo = new THREE.TorusGeometry(1.4, 0.006, 8, 120);
+const ringMat = new THREE.MeshBasicMaterial({ color: 0x00e5a0, transparent: true, opacity: 0.2 });
+const orbitRing = new THREE.Mesh(ringGeo, ringMat);
+orbitRing.rotation.x = Math.PI * 0.42;
+scene.add(orbitRing);
+
+// Second orbital ring (perpendicular)
+const ring2 = new THREE.Mesh(
+  new THREE.TorusGeometry(1.55, 0.003, 8, 100),
+  new THREE.MeshBasicMaterial({ color: 0x00e5a0, transparent: true, opacity: 0.1 })
+);
+ring2.rotation.y = Math.PI * 0.3;
+ring2.rotation.z = Math.PI * 0.2;
+scene.add(ring2);
+
+// Mouse influence on globe
+let gMX = 0, gMY = 0;
+document.addEventListener('mousemove', e => {
+  gMX = (e.clientX / window.innerWidth - 0.5) * 2;
+  gMY = (e.clientY / window.innerHeight - 0.5) * 2;
+});
+
+// Animate
+let frame = 0;
+(function render() {
+  requestAnimationFrame(render);
+  frame += 0.008;
+  globe.rotation.y = frame * 0.2 + gMX * 0.35;
+  globe.rotation.x = gMY * 0.18;
+  surfPts.rotation.y = frame * 0.16;
+  surfPts.rotation.x = Math.sin(frame * 0.07) * 0.12;
+  orbitRing.rotation.z = frame * 0.06;
+  ring2.rotation.y += 0.003;
+  atmMat.opacity = 0.03 + Math.sin(frame * 1.2) * 0.02;
+  globeMat.opacity = 0.08 + Math.sin(frame * 0.7) * 0.03;
+  renderer.render(scene, camera);
+})();
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ═══ SCROLL REVEAL ═══
+const rvObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('.rv').forEach(el => rvObs.observe(el));
+
+// ═══ NAV DOTS ═══
+const sectionIds = ['hero','africa','asia','europe','north-america','south-america','oceania','antarctica'];
+const navDots = document.querySelectorAll('.nav-dot');
+navDots.forEach((dot, i) => {
+  dot.addEventListener('click', () => {
+    document.getElementById(sectionIds[i])?.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+const secObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      const i = sectionIds.indexOf(id);
+      navDots.forEach(d => d.classList.remove('active'));
+      if (i >= 0) navDots[i].classList.add('active');
+    }
+  });
+}, { threshold: 0.45 });
+sectionIds.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) secObs.observe(el);
+});
+
+// ═══ PARALLAX ORBS ═══
+let ticking = false;
+window.addEventListener('scroll', () => {
+  if (!ticking) {
+    requestAnimationFrame(() => {
+      const sy = window.scrollY;
+      document.querySelectorAll('.c-bg-orb').forEach((orb, i) => {
+        const dir = i % 2 === 0 ? 1 : -1;
+        orb.style.transform = `translateY(calc(-50% + ${sy * 0.06 * dir}px))`;
+      });
+      ticking = false;
+    });
+    ticking = true;
+  }
+});
+
+// ═══ CARD TILT ON HOVER ═══
+document.querySelectorAll('.a-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    const inner = card.querySelector('.a-inner');
+    if (!inner.style.transform.includes('180')) {
+      card.style.transform = `perspective(1000px) rotateX(${y * -8}deg) rotateY(${x * 8}deg) scale(1.02)`;
+    }
+  });
+  card.addEventListener('mouseleave', e => {
+    card.style.transform = '';
+  });
+});
+</script>
+</body>
+</html>
