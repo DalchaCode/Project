@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Letërsia në Antikitet</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --parchment: #f4e4c1;
+    --parchment-dark: #e8d4a0;
+    --parchment-deep: #d4b87a;
+    --ink: #2c1a0e;
+    --ink-light: #4a2e1a;
+    --gold: #c8922a;
+    --gold-light: #e8b84b;
+    --gold-glow: #f5d06e;
+    --red-seal: #8b1a1a;
+    --shadow: rgba(20, 10, 0, 0.7);
+    --leather: #5c3317;
+    --leather-dark: #3a1f0a;
+    --spine: #2a1208;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: radial-gradient(ellipse at center, #1a0d05 0%, #0d0602 60%, #000 100%);
+    min-height: 100vh;
+    font-family: 'EB Garamond', serif;
+    overflow-x: hidden;
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='4' fill='%23c8922a' opacity='0.8'/%3E%3C/svg%3E") 10 10, auto;
+  }
+
+  /* ─── INTRO OVERLAY ─── */
+  #intro {
+    position: fixed; inset: 0; z-index: 1000;
+    background: radial-gradient(ellipse at center, #0d0602 0%, #000 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    animation: introFade 0.8s ease 5.5s forwards;
+    pointer-events: none;
+  }
+  #intro .intro-title {
+    font-family: 'Cinzel Decorative', serif;
+    color: var(--gold);
+    font-size: clamp(1.2rem, 4vw, 2.5rem);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: titleReveal 1.5s ease 0.5s forwards;
+    text-shadow: 0 0 40px rgba(200,146,42,0.8);
+  }
+  #intro .intro-sub {
+    color: var(--parchment-dark);
+    font-size: clamp(0.8rem, 2vw, 1.1rem);
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    opacity: 0;
+    margin-top: 12px;
+    animation: titleReveal 1.5s ease 1.2s forwards;
+  }
+  #intro .intro-line {
+    width: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 20px 0;
+    animation: lineExpand 1.2s ease 2s forwards;
+  }
+  @keyframes introFade { to { opacity: 0; pointer-events: none; } }
+  @keyframes titleReveal { to { opacity: 1; } }
+  @keyframes lineExpand { to { width: 400px; } }
+
+  /* ─── SPARKS ─── */
+  .spark {
+    position: fixed; pointer-events: none; z-index: 999;
+    width: 4px; height: 4px; border-radius: 50%;
+    background: var(--gold-light);
+    box-shadow: 0 0 6px var(--gold-glow);
+  }
+
+  /* ─── STARS BG ─── */
+  #stars {
+    position: fixed; inset: 0; z-index: 0; overflow: hidden;
+    pointer-events: none;
+  }
+  .star {
+    position: absolute; border-radius: 50%;
+    background: white;
+    animation: twinkle var(--dur) ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: var(--min-op); transform: scale(1); }
+    50% { opacity: var(--max-op); transform: scale(1.3); }
+  }
+
+  /* ─── CANDLE FLAMES ─── */
+  .candle-wrap {
+    position: fixed; bottom: 30px; z-index: 10; pointer-events: none;
+  }
+  .candle-wrap.left { left: 30px; }
+  .candle-wrap.right { right: 30px; }
+  .candle-body {
+    width: 14px; height: 60px;
+    background: linear-gradient(180deg, #f0e0b0, #d4b87a);
+    border-radius: 3px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .candle-flame {
+    width: 12px; height: 22px;
+    background: radial-gradient(ellipse at 50% 80%, #fff 0%, #ffe066 30%, #ffaa00 60%, rgba(255,60,0,0) 100%);
+    border-radius: 50% 50% 30% 30%;
+    position: absolute; top: -22px; left: 1px;
+    animation: flicker 1.8s ease-in-out infinite alternate;
+    filter: blur(0.5px);
+  }
+  .candle-glow {
+    width: 40px; height: 40px;
+    background: radial-gradient(circle, rgba(255,180,0,0.25) 0%, transparent 70%);
+    position: absolute; top: -30px; left: -14px;
+    animation: glowPulse 1.8s ease-in-out infinite alternate;
+    border-radius: 50%;
+  }
+  @keyframes flicker {
+    0% { transform: skew(-2deg) scaleX(0.95); opacity: 0.9; }
+    100% { transform: skew(2deg) scaleX(1.05); opacity: 1; }
+  }
+  @keyframes glowPulse {
+    0% { opacity: 0.6; transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1.15); }
+  }
+
+  /* ─── MAIN BOOK WRAPPER ─── */
+  #book-container {
+    position: relative; z-index: 5;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 100px;
+    opacity: 0;
+    animation: bookAppear 1.2s ease 5.8s forwards;
+  }
+  @keyframes bookAppear { to { opacity: 1; } }
+
+  /* ─── TOP ORNAMENT ─── */
+  .top-ornament {
+    text-align: center; margin-bottom: 30px;
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+    font-size: 1.4rem;
+    letter-spacing: 0.4em;
+    text-shadow: 0 0 20px rgba(200,146,42,0.6);
+  }
+  .top-ornament::before,
+  .top-ornament::after {
+    content: '✦'; display: inline-block; margin: 0 15px;
+    animation: rotateStar 8s linear infinite;
+    font-size: 0.8rem;
+  }
+  @keyframes rotateStar { to { transform: rotate(360deg); } }
+
+  /* ─── THE OPEN BOOK ─── */
+  .book-spread {
+    width: min(1100px, 96vw);
+    background: linear-gradient(135deg, #2a1208 0%, #3d1c0e 30%, #2a1208 100%);
+    border-radius: 8px 18px 18px 8px;
+    box-shadow:
+      -8px 0 20px rgba(0,0,0,0.8),
+      0 20px 60px rgba(0,0,0,0.9),
+      inset 0 0 30px rgba(0,0,0,0.4),
+      0 0 100px rgba(200,146,42,0.15);
+    display: grid;
+    grid-template-columns: 1fr 6px 1fr;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--leather);
+    margin-bottom: 8px;
+    transition: transform 0.3s ease;
+  }
+  .book-spread:hover { transform: scale(1.002); }
+
+  /* Leather corners */
+  .book-spread::before,
+  .book-spread::after {
+    content: '';
+    position: absolute;
+    width: 30px; height: 30px;
+    background: radial-gradient(circle at 0 0, var(--gold) 0%, var(--leather-dark) 60%);
+    z-index: 10;
+    opacity: 0.7;
+  }
+  .book-spread::before { top: 0; left: 0; border-radius: 0 0 100% 0; }
+  .book-spread::after { top: 0; right: 0; border-radius: 0 0 0 100%; }
+
+  /* Page (left or right) */
+  .page {
+    background: var(--parchment);
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"),
+      linear-gradient(180deg, var(--parchment) 0%, #f0ddb5 50%, var(--parchment) 100%);
+    padding: 40px 36px;
+    position: relative;
+    min-height: 600px;
+  }
+  .page.left {
+    border-radius: 6px 0 0 6px;
+    box-shadow: inset -8px 0 20px rgba(0,0,0,0.12);
+  }
+  .page.right {
+    border-radius: 0 6px 6px 0;
+    box-shadow: inset 8px 0 20px rgba(0,0,0,0.12);
+  }
+
+  /* Page edge lines */
+  .page.left::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    background: repeating-linear-gradient(180deg,
+      rgba(180,140,60,0.3) 0px, rgba(180,140,60,0.3) 2px,
+      transparent 2px, transparent 8px);
+  }
+  .page.right::after {
+    content: '';
+    position: absolute; right: 0; top: 0; bottom: 0; width: 4px;
+    background: repeating-linear-gradient(180deg,
+      rgba(180,140,60,0.3) 0px, rgba(180,140,60,0.3) 2px,
+      transparent 2px, transparent 8px);
+  }
+
+  /* Spine */
+  .spine {
+    background: linear-gradient(180deg,
+      var(--spine) 0%, #5a2a12 10%, var(--spine) 50%, #5a2a12 90%, var(--spine) 100%);
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .spine::before {
+    content: '';
+    position: absolute; inset: 5px 1px;
+    background: linear-gradient(180deg,
+      transparent 0%, rgba(200,146,42,0.3) 20%, rgba(200,146,42,0.5) 50%,
+      rgba(200,146,42,0.3) 80%, transparent 100%);
+  }
+
+  /* ─── PAGE LINE RULES ─── */
+  .page-lines {
+    position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(
+      180deg,
+      transparent 0px, transparent 31px,
+      rgba(180,140,80,0.18) 31px, rgba(180,140,80,0.18) 32px
+    );
+    pointer-events: none;
+  }
+
+  /* ─── PAGE NUMBER ─── */
+  .page-num {
+    text-align: center;
+    color: var(--ink-light);
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    margin-top: 20px;
+    opacity: 0.6;
+  }
+
+  /* ─── SECTION HEADINGS ─── */
+  .section-label {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(0.55rem, 1.5vw, 0.8rem);
+    letter-spacing: 0.45em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-label::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--gold-light), transparent);
+  }
+
+  .chapter-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    color: var(--ink);
+    line-height: 1.2;
+    margin-bottom: 18px;
+    text-shadow: 1px 1px 0 rgba(200,146,42,0.2);
+  }
+  .chapter-title span { color: var(--gold); }
+
+  .dropcap {
+    float: left;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 4.5em;
+    line-height: 0.7;
+    margin: 8px 10px -4px 0;
+    color: var(--red-seal);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+  }
+
+  p.body-text {
+    color: var(--ink);
+    font-size: clamp(0.85rem, 1.5vw, 1.05rem);
+    line-height: 1.9;
+    margin-bottom: 14px;
+    text-align: justify;
+    hyphens: auto;
+  }
+
+  /* ─── ORNAMENTAL DIVIDER ─── */
+  .ornament {
+    text-align: center;
+    color: var(--gold);
+    margin: 16px 0;
+    font-size: 1rem;
+    letter-spacing: 0.5em;
+    opacity: 0.8;
+  }
+
+  /* ─── ILLUMINATED BORDER ─── */
+  .illuminated {
+    border: 2px solid var(--gold);
+    border-radius: 4px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    background: rgba(200,146,42,0.05);
+    position: relative;
+  }
+  .illuminated::before,
+  .illuminated::after {
+    content: '❧';
+    position: absolute;
+    color: var(--gold);
+    font-size: 1rem;
+    opacity: 0.7;
+  }
+  .illuminated::before { top: -10px; left: 10px; }
+  .illuminated::after { bottom: -10px; right: 10px; transform: rotate(180deg); }
+
+  /* ─── QUOTE BLOCK ─── */
+  .quote-block {
+    border-left: 3px solid var(--gold);
+    padding: 10px 16px;
+    margin: 16px 0;
+    background: rgba(200,146,42,0.06);
+    border-radius: 0 4px 4px 0;
+  }
+  .quote-block p {
+    font-style: italic;
+    font-size: clamp(0.9rem, 1.6vw, 1.1rem);
+    color: var(--ink-light);
+    line-height: 1.7;
+  }
+  .quote-block .q-attr {
+    text-align: right;
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    margin-top: 6px;
+  }
+
+  /* ─── AUTHOR CARD ─── */
+  .author-card {
+    display: flex; gap: 16px; align-items: flex-start;
+    background: linear-gradient(135deg, rgba(200,146,42,0.08) 0%, rgba(200,146,42,0.03) 100%);
+    border: 1px solid rgba(200,146,42,0.3);
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 18px;
+    transition: all 0.3s ease;
+    cursor: default;
+  }
+  .author-card:hover {
+    border-color: var(--gold);
+    box-shadow: 0 4px 20px rgba(200,146,42,0.15);
+    transform: translateX(4px);
+  }
+  .author-bust {
+    width: 60px; height: 60px; flex-shrink: 0;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
+    background: radial-gradient(circle, rgba(200,146,42,0.15) 0%, transparent 70%);
+    box-shadow: 0 0 12px rgba(200,146,42,0.3);
+  }
+  .author-info h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .author-info .dates {
+    font-size: 0.75rem;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    font-family: 'Cinzel', serif;
+    margin-bottom: 6px;
+  }
+  .author-info p {
+    font-size: 0.85rem;
+    color: var(--ink-light);
+    line-height: 1.6;
+  }
+
+  /* ─── WORK CARD ─── */
+  .work-card {
+    background: linear-gradient(180deg, rgba(200,146,42,0.07), rgba(200,146,42,0.02));
+    border: 1px solid rgba(200,146,42,0.25);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin-bottom: 14px;
+    transition: all 0.3s ease;
+    position: relative; overflow: hidden;
+  }
+  .work-card::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--gold);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.3s ease;
+  }
+  .work-card:hover::before { transform: scaleY(1); }
+  .work-card:hover {
+    border-color: var(--gold);
+    box-shadow: 0 4px 20px rgba(200,146,42,0.12);
+  }
+  .work-card h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    color: var(--ink);
+    margin-bottom: 6px;
+    font-style: italic;
+  }
+  .work-card .work-meta {
+    font-size: 0.72rem;
+    color: var(--gold);
+    letter-spacing: 0.2em;
+    font-family: 'Cinzel', serif;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .work-card p {
+    font-size: 0.82rem;
+    color: var(--ink-light);
+    line-height: 1.65;
+  }
+
+  /* ─── SEAL / BADGE ─── */
+  .wax-seal {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 54px; height: 54px;
+    background: radial-gradient(circle at 35% 35%, #c0392b, #7b0000);
+    border-radius: 50%;
+    color: var(--parchment);
+    font-size: 1.3rem;
+    box-shadow:
+      0 3px 10px rgba(139,26,26,0.5),
+      inset 0 -2px 4px rgba(0,0,0,0.3),
+      inset 0 2px 4px rgba(255,255,255,0.1);
+    position: absolute;
+    top: -10px; right: 20px;
+    animation: sealWobble 4s ease-in-out infinite;
+  }
+  @keyframes sealWobble {
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+  }
+
+  /* ─── TABLE ─── */
+  .period-table {
+    width: 100%; border-collapse: collapse; margin: 16px 0;
+    font-size: 0.82rem;
+  }
+  .period-table th {
+    font-family: 'Cinzel', serif;
+    color: var(--gold);
+    border-bottom: 2px solid var(--gold);
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .period-table td {
+    color: var(--ink);
+    padding: 7px 10px;
+    border-bottom: 1px solid rgba(180,140,60,0.2);
+    line-height: 1.5;
+    vertical-align: top;
+  }
+  .period-table tr:hover td {
+    background: rgba(200,146,42,0.06);
+  }
+
+  /* ─── SCROLL INDICATOR ─── */
+  #scroll-guide {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    z-index: 20;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    opacity: 0;
+    animation: guideAppear 1s ease 7s forwards;
+    transition: opacity 0.5s;
+  }
+  #scroll-guide.hidden { opacity: 0 !important; }
+  @keyframes guideAppear { to { opacity: 1; } }
+  #scroll-guide span {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    color: var(--gold);
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+  .scroll-arrow {
+    width: 20px; height: 20px;
+    border-right: 2px solid var(--gold);
+    border-bottom: 2px solid var(--gold);
+    transform: rotate(45deg);
+    opacity: 0.6;
+    animation: arrowBounce 1.5s ease-in-out infinite;
+  }
+  @keyframes arrowBounce {
+    0%, 100% { transform: rotate(45deg) translate(0,0); }
+    50% { transform: rotate(45deg) translate(4px,4px); }
+  }
+
+  /* ─── PAGE TURN EFFECT ─── */
+  .book-spread {
+    animation: pageReveal 0.8s ease both;
+  }
+  @keyframes pageReveal {
+    from { opacity: 0; transform: perspective(1000px) rotateY(-8deg) scale(0.97); }
+    to { opacity: 1; transform: perspective(1000px) rotateY(0) scale(1); }
+  }
+
+  /* Scroll-based appearance */
+  .spread-wrapper {
+    width: 100%;
+    display: flex; flex-direction: column; align-items: center;
+    margin-bottom: 40px;
+  }
+  .spread-wrapper .page-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    color: rgba(200,146,42,0.5);
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  /* Reveal on scroll */
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ─── PROGRESS BAR ─── */
+  #reading-progress {
+    position: fixed; top: 0; left: 0; height: 3px; z-index: 100;
+    background: linear-gradient(90deg, var(--gold), var(--gold-glow), var(--gold));
+    width: 0%; transition: width 0.1s linear;
+    box-shadow: 0 0 8px var(--gold-glow);
+  }
+
+  /* ─── FLYING PARTICLES ─── */
+  .particle {
+    position: fixed; pointer-events: none; z-index: 999;
+    width: 3px; height: 3px; border-radius: 50%;
+    background: var(--gold-light);
+    opacity: 0;
+  }
+
+  /* ─── NAV DOTS ─── */
+  #nav-dots {
+    position: fixed; right: 20px; top: 50%; transform: translateY(-50%);
+    z-index: 50; display: flex; flex-direction: column; gap: 12px;
+    opacity: 0;
+    animation: guideAppear 1s ease 7s forwards;
+  }
+  .nav-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(200,146,42,0.3);
+    border: 1px solid rgba(200,146,42,0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  .nav-dot:hover, .nav-dot.active {
+    background: var(--gold);
+    box-shadow: 0 0 8px var(--gold-glow);
+    transform: scale(1.4);
+  }
+  .nav-dot::after {
+    content: attr(data-label);
+    position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+    white-space: nowrap;
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    color: var(--gold);
+    letter-spacing: 0.2em;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .nav-dot:hover::after { opacity: 1; }
+
+  /* ─── FULL IMAGE BG DIVIDER ─── */
+  .visual-divider {
+    width: min(1100px, 96vw);
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), rgba(245,208,110,0.6), var(--gold), transparent);
+    margin: 0 auto 40px;
+    box-shadow: 0 0 15px rgba(200,146,42,0.4);
+  }
+
+  /* ─── ANCIENT MAP HEADER ─── */
+  .book-header {
+    width: min(1100px, 96vw);
+    text-align: center;
+    padding: 30px;
+    background: linear-gradient(180deg, rgba(200,146,42,0.08) 0%, transparent 100%);
+    border: 1px solid rgba(200,146,42,0.2);
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+  .book-header h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.4rem, 4vw, 3rem);
+    color: var(--gold);
+    text-shadow: 0 0 30px rgba(200,146,42,0.5), 0 2px 4px rgba(0,0,0,0.5);
+    letter-spacing: 0.15em;
+    margin-bottom: 8px;
+  }
+  .book-header .subtitle {
+    font-family: 'Cinzel', serif;
+    color: var(--parchment-dark);
+    font-size: clamp(0.7rem, 2vw, 1rem);
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  /* ─── FOOTER ─── */
+  .book-footer {
+    font-family: 'Cinzel', serif;
+    color: rgba(200,146,42,0.4);
+    font-size: 0.65rem;
+    letter-spacing: 0.4em;
+    text-align: center;
+    padding: 30px;
+    text-transform: uppercase;
+  }
+
+  /* ─── TOOLTIP ─── */
+  [data-tip] { position: relative; cursor: help; }
+  [data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%);
+    background: var(--ink);
+    color: var(--parchment);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    border: 1px solid var(--gold);
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  /* Column layout */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+  .full-page .page { min-height: 700px; }
+
+  /* ─── MINI TIMELINE ─── */
+  .timeline {
+    position: relative;
+    padding-left: 24px;
+    border-left: 2px solid rgba(200,146,42,0.3);
+  }
+  .timeline-item {
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute; left: -29px; top: 4px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 6px rgba(200,146,42,0.5);
+  }
+  .timeline-item .t-year {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem; color: var(--gold); letter-spacing: 0.2em;
+    margin-bottom: 3px;
+  }
+  .timeline-item p {
+    font-size: 0.82rem; color: var(--ink-light); line-height: 1.55;
+  }
+
+  /* image placeholder */
+  .ancient-img {
+    width: 100%; border-radius: 4px;
+    border: 2px solid rgba(200,146,42,0.3);
+    background: linear-gradient(135deg, rgba(200,146,42,0.05), rgba(200,146,42,0.1));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3rem; padding: 20px;
+    color: var(--gold); opacity: 0.6;
+    margin-bottom: 12px;
+    min-height: 100px;
+    flex-direction: column; gap: 6px;
+  }
+  .ancient-img span {
+    font-family: 'Cinzel', serif; font-size: 0.65rem;
+    letter-spacing: 0.2em; text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── PROGRESS BAR ── -->
+<div id="reading-progress"></div>
+
+<!-- ── INTRO OVERLAY ── -->
+<div id="intro">
+  <div class="intro-title">Letërsia në Antikitet</div>
+  <div class="intro-line"></div>
+  <div class="intro-sub">Libri po hapet · Faqja e parë po shpaloset</div>
+</div>
+
+<!-- ── STARS ── -->
+<div id="stars"></div>
+
+<!-- ── CANDLES ── -->
+<div class="candle-wrap left">
+  <div class="candle-body">
+    <div class="candle-flame"></div>
+    <div class="candle-glow"></div>
+  </div>
+</div>
+<div class="candle-wrap right">
+  <div class="candle-body">
+    <div class="candle-flame"></div>
+    <div class="candle-glow"></div>
+  </div>
+</div>
+
+<!-- ── NAV DOTS ── -->
+<div id="nav-dots">
+  <div class="nav-dot active" data-label="Hyrje" onclick="scrollToSection(0)"></div>
+  <div class="nav-dot" data-label="Periudha" onclick="scrollToSection(1)"></div>
+  <div class="nav-dot" data-label="Veprat" onclick="scrollToSection(2)"></div>
+  <div class="nav-dot" data-label="Autorët" onclick="scrollToSection(3)"></div>
+  <div class="nav-dot" data-label="Shprehjet" onclick="scrollToSection(4)"></div>
+  <div class="nav-dot" data-label="Trashëgimia" onclick="scrollToSection(5)"></div>
+</div>
+
+<!-- ── SCROLL GUIDE ── -->
+<div id="scroll-guide">
+  <span>Kalo faqen</span>
+  <div class="scroll-arrow"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+        MAIN BOOK CONTENT
+     ══════════════════════════════════════ -->
+<div id="book-container">
+
+  <!-- BOOK HEADER -->
+  <div class="book-header reveal" id="section-0">
+    <div class="top-ornament">✦ VOLUMEN ANTIQUUM ✦</div>
+    <h1>Letërsia në Antikitet</h1>
+    <div class="subtitle">Zanafilla e fjalës · Burimet e mendimit · Trashëgimia e amshuar</div>
+  </div>
+
+  <!-- ══ SPREAD 1: HYRJE + PERIUDHA ══ -->
+  <div class="spread-wrapper reveal" id="section-1">
+    <div class="page-label">Faqja I — Hyrje & Periudha</div>
+    <div class="book-spread">
+      <!-- LEFT PAGE: HYRJE -->
+      <div class="page left">
+        <div class="page-lines"></div>
+        <div class="wax-seal">📜</div>
+
+        <div class="section-label">Kapitulli I</div>
+        <h2 class="chapter-title">Çfarë është <span>Antikiteti</span>?</h2>
+
+        <p class="body-text">
+          <span class="dropcap">A</span>ntikiteti letrar përfaqëson periudhën e largët të historisë njerëzore ku fjala e shkruar mori formën e saj të parë madhështore. Nga bredhat e papirusit egjiptian deri te tabelat e argjilës babilonase, njerëzimi filloi të shënonte ëndrrat, ligjet, luftërat dhe filozofinë e tij.
+        </p>
+
+        <div class="illuminated">
+          <p class="body-text" style="margin:0">
+            Periudha antike e letërsisë shtrihet nga <strong>rreth 3000 para erës sonë</strong> — kur u shkruan tekstet e para mesopotamase — deri në <strong>shekullin e V pas erës sonë</strong>, me rënien e Perandorisë Romake Perëndimore. Kjo periudhë prej 3500 vjetësh është themeli i të gjithë kulturës perëndimore dhe jo vetëm.
+          </p>
+        </div>
+
+        <p class="body-text">
+          Dy qytetërimet kryesore që lënë gjurmën më të madhe në letërsinë botërore janë Greqia dhe Roma. Bashkë me to, kultura egjiptiane, mesopotamase, hebraike dhe indiane dhanë trashëgimi të çmueshme që ende rezonojnë sot.
+        </p>
+
+        <div class="ornament">❦ ✦ ❦</div>
+
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="t-year">~3000 P.E.S.</div>
+            <p>Shkrimet e para mesopotamase — Eposi i Gilgameshit fillon të marrë formë.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="t-year">~800 P.E.S.</div>
+            <p>Homeri kompozon <em>Iliadën</em> dhe <em>Odissenë</em> — pikën kulmore të epikës greke.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="t-year">~450 P.E.S.</div>
+            <div class="t-year" style="margin-top:2px">Shekulli i Artë</div>
+            <p>Aeschylus, Sofokli, Euripidi, Aristofani — Greqia arrin kulmin tragjik.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="t-year">~70 P.E.S. – 14 P.E.S.</div>
+            <p>Epoka Augustane — Virgjili, Horaci, Ovidi — Roma shines letrar.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="t-year">476 P.E.S.</div>
+            <p>Rënia e Romës — Fundi konvencional i Antikitetit Klasik.</p>
+          </div>
+        </div>
+
+        <div class="page-num">— I —</div>
+      </div>
+
+      <!-- SPINE -->
+      <div class="spine"></div>
+
+      <!-- RIGHT PAGE: PERIUDHA -->
+      <div class="page right">
+        <div class="page-lines"></div>
+
+        <div class="section-label">Periudha Historike</div>
+        <h2 class="chapter-title">Drunjtë e <span>Qytetërimeve</span></h2>
+
+        <p class="body-text">
+          Letërsia antike nuk ishte produkt i një vendi të vetëm. Ajo u rrit si një pemë me shumë degë, ku çdo qytetërim shtoi degën e vet — poezia greke, proza romake, urtësia lindore, miti egjiptian.
+        </p>
+
+        <table class="period-table">
+          <thead>
+            <tr>
+              <th>Qytetërimi</th>
+              <th>Periudha</th>
+              <th>Kontributi Kryesor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-tip="Zanafilla e epikës dhe filozofisë"><strong>Greqia</strong></td>
+              <td>800 – 146 P.E.S.</td>
+              <td>Epikë, tragji, filozofi, histori</td>
+            </tr>
+            <tr>
+              <td data-tip="Perandoria e madhe mesdhetare"><strong>Roma</strong></td>
+              <td>753 P.E.S. – 476 P.E.S.</td>
+              <td>Poezi, oratori, të drejtë, epi</td>
+            </tr>
+            <tr>
+              <td data-tip="Eposi i parë letrar i njerëzimit"><strong>Mesopotamia</strong></td>
+              <td>3000 – 500 P.E.S.</td>
+              <td>Epi, ligje, mitologji</td>
+            </tr>
+            <tr>
+              <td data-tip="Libri i të Vdekurve dhe himnet hyjnore"><strong>Egjipti</strong></td>
+              <td>3000 – 30 P.E.S.</td>
+              <td>Himne, filozofi, narrativë</td>
+            </tr>
+            <tr>
+              <td data-tip="Tradita orale dhe Veda"><strong>India</strong></td>
+              <td>1500 – 500 P.E.S.</td>
+              <td>Veda, epikë (Mahabharata)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="quote-block">
+          <p>"Letërsia është kujtesa e njerëzimit. Pa të, çdo brez do të fillonte nga zero."</p>
+          <div class="q-attr">— Reflektim mbi antikitetin</div>
+        </div>
+
+        <p class="body-text">
+          Çdo qytetërim antik ndërtoi një sistem mendimi dhe shprehjeje unik. Filozofia greke na mësoi të pyesim. Roma na mësoi të organizojmë. Lindja na mësoi të meditiojmë. Trashëgimia e tyre është e pandashme nga identiteti modern i njerëzimit.
+        </p>
+
+        <div class="ornament">— ✦ —</div>
+
+        <div class="ancient-img">🏛️<span>Tempulli i Partenonit, Athina</span></div>
+
+        <div class="page-num">— II —</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="visual-divider"></div>
+
+  <!-- ══ SPREAD 2: VEPRAT E ANTIKITETIT ══ -->
+  <div class="spread-wrapper reveal" id="section-2">
+    <div class="page-label">Faqja II — Veprat e Mëdha</div>
+    <div class="book-spread">
+      <!-- LEFT -->
+      <div class="page left">
+        <div class="page-lines"></div>
+
+        <div class="section-label">Kapitulli II</div>
+        <h2 class="chapter-title">Veprat e <span>Antikitetit</span></h2>
+
+        <p class="body-text">
+          Veprat e letërsisë antike nuk janë thjesht tekste të vjetra — ato janë monumente mendore, ndërtesa të fjalës që kanë rezistuar mijëra vjet. Secila mbart brenda saj botën e saj, njerëzit e saj, llogikat e saj.
+        </p>
+
+        <div class="work-card">
+          <div class="wax-seal" style="position:relative; top:auto; right:auto; width:36px; height:36px; font-size:1rem; float:right; margin-left:10px;">⚔️</div>
+          <h3>Iliada — Ἰλιάς</h3>
+          <div class="work-meta">Homer · ~800 P.E.S. · Poezi epike · Greqi</div>
+          <p>Eposi i luftës së Trojës. 24 libra, 15,693 vargje. Vepra rrëfen zemërimin e Akilit dhe pasojat e tij fatale. Paraqet heroin si njeri me ndjeshmëri dhe kontradikta — jo si zot i paprekshëm.</p>
+        </div>
+
+        <div class="work-card">
+          <h3>Odiseja — Ὀδύσσεια</h3>
+          <div class="work-meta">Homer · ~800 P.E.S. · Poezi epike · Greqi</div>
+          <p>Udhëtimi dhjetëvjeçar i Odiseut nga Troja në Itakë. Vepra e parë e madhe e aventurës dhe mençurisë njerëzore. Ulisi përdor mendjemprehtësinë, jo forcën, si armë kryesore.</p>
+        </div>
+
+        <div class="work-card">
+          <h3>Eneida — Aeneis</h3>
+          <div class="work-meta">Virgjili · 29–19 P.E.S. · Poezi epike · Romë</div>
+          <p>Themelimi mitik i Romës përmes syve të Eneas, trojanit të arratisur. Virgjili e shkroi këtë epopé me urdhër të Augustit për të legjitimuar Perandorinë Romake. Kryevepër stilistike latine.</p>
+        </div>
+
+        <div class="work-card">
+          <h3>Eposi i Gilgameshit</h3>
+          <div class="work-meta">Anonim · ~2100 P.E.S. · Epikë · Mesopotami</div>
+          <p>Vepra më e vjetër letrare e njohur e njerëzimit. Rrëfen mbretin Gilgamesh dhe miqësinë e tij me Enkidun, si dhe kërkimin e tij të pavdekësisë. Tregon frikën, dashurinë dhe pranimin e vdekshmërisë.</p>
+        </div>
+
+        <div class="page-num">— III —</div>
+      </div>
+
+      <!-- SPINE -->
+      <div class="spine"></div>
+
+      <!-- RIGHT -->
+      <div class="page right">
+        <div class="page-lines"></div>
+
+        <div class="section-label">Vazhdim · Veprat</div>
+        <h2 class="chapter-title">Shfaqjet & <span>Filozofia</span></h2>
+
+        <div class="work-card">
+          <h3>Oresteia — Ὀρέστεια</h3>
+          <div class="work-meta">Aeschylus · 458 P.E.S. · Trilogji tragjike · Greqi</div>
+          <p>Trilogjia e vetme tragjike e plotë që ka mbijetuar nga antikiteti. Agamemnoni, Koeforët dhe Eumidet. Trakton hakmarrjen, drejtësinë dhe lindjen e demokracisë ligjore athinas.</p>
+        </div>
+
+        <div class="work-card">
+          <h3>Oidipusi Mbret — Οἰδίπους Τύραννος</h3>
+          <div class="work-meta">Sofokli · ~429 P.E.S. · Tragji · Greqi</div>
+          <p>Aristoteli e quante "tragjedia e përsosur". Oidipusi zbulon se ai vetë është krimineli që kërkon. Paraqet paevitueshmërinë e fatit dhe dëshirën tragjike njerëzore për të ditur të vërtetën.</p>
+        </div>
+
+        <div class="work-card">
+          <h3>Republika — Πολιτεία</h3>
+          <div class="work-meta">Platoni · ~380 P.E.S. · Dialog filozofik · Greqi</div>
+          <p>Vepra qendrore e filozofisë politike perëndimore. Platoni diskuton drejtësinë, shtetin ideal, edukimin dhe rolin e filozofit-mbret. Allegoria e shpellës është ndër imazhet më të fuqishme të mendimit njerëzor.</p>
+        </div>
+
+        <div class="work-card">
+          <h3>Metamorfozat — Metamorphōseōn</h3>
+          <div class="work-meta">Ovidi · 8 P.E.S. · Poezi narrative · Romë</div>
+          <p>250 mite greke dhe romake të ricaktuara artistikisht. 15 libra, nga kaosi fillestar deri te hyjnëzimi i Cezarit. Ovidi transformon mitin në art — duke e bërë atë personal, ironik dhe të bukur njëherazi.</p>
+        </div>
+
+        <div class="ornament">❦ — ❦</div>
+
+        <p class="body-text" style="font-size:0.82rem">
+          Vepra të tjera të rëndësishme përfshijnë: <em>Historitë</em> e Herodotit, <em>Lufta Peloponeze</em> e Tukididit, <em>Antigona</em> e Sofoklit, <em>Lisistrata</em> e Aristofanit, dhe <em>Medeea</em> e Euripidit — secila me botën e vet të pazëvendësueshme.
+        </p>
+
+        <div class="page-num">— IV —</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="visual-divider"></div>
+
+  <!-- ══ SPREAD 3: AUTORËT ══ -->
+  <div class="spread-wrapper reveal" id="section-3">
+    <div class="page-label">Faqja III — Autorët e Antikitetit</div>
+    <div class="book-spread">
+      <!-- LEFT -->
+      <div class="page left">
+        <div class="page-lines"></div>
+
+        <div class="section-label">Kapitulli III</div>
+        <h2 class="chapter-title">Zërat e <span>Lashtësisë</span></h2>
+
+        <p class="body-text">
+          <span class="dropcap">A</span>utorët antikë ishin njerëz si ne — me frikë, dashuri, dyshime e besime. Ndryshimi? Ata shkruanin me pendë prej kalami në botë pa rrymë elektrike, dhe sot fjalët e tyre ndizin ndritë brenda nesh.
+        </p>
+
+        <div class="author-card">
+          <div class="author-bust">🏺</div>
+          <div class="author-info">
+            <h3>Homeri — Ὅμηρος</h3>
+            <div class="dates">~800 P.E.S. · Greqi · Poet Epik</div>
+            <p>Autori i supozuar i Iliadës dhe Odisesë. Shumë historianë besojnë se "Homeri" ishte traditë kolektive. Ai personifikon tranzicionin nga epika gojore te ajo e shkruar. Influenca e tij është bazë e çdo letërsie perëndimore.</p>
+          </div>
+        </div>
+
+        <div class="author-card">
+          <div class="author-bust">🧠</div>
+          <div class="author-info">
+            <h3>Sofokli — Σοφοκλῆς</h3>
+            <div class="dates">496 – 406 P.E.S. · Athinë · Tragjed</div>
+            <p>Shkroi 123 drama, por vetëm 7 kanë mbijetuar. Ai e solli psikologjinë njerëzore në qendër të tragjedisë. Oidipusi, Antigona dhe Elektra janë personazhe që ende analizojmë si fqinj tonë.</p>
+          </div>
+        </div>
+
+        <div class="author-card">
+          <div class="author-bust">🦅</div>
+          <div class="author-info">
+            <h3>Aeschylus — Αἰσχύλος</h3>
+            <div class="dates">525 – 456 P.E.S. · Athinë · "Ati i Tragjedisë"</div>
+            <p>Personazhi i parë profesional i teatrit. Shtoi aktorin e dytë — duke kthyer monologun në dialog. Luftëtar në Maratonë, ai e njohu dhunën nga afër dhe i dha tragjedisë thellësinë e saj të vërtetë.</p>
+          </div>
+        </div>
+
+        <div class="author-card">
+          <div class="author-bust">🌿</div>
+          <div class="author-info">
+            <h3>Virgjili — Publius Vergilius Maro</h3>
+            <div class="dates">70 – 19 P.E.S. · Romë · Poet</div>
+            <p>Poetit më të madh latin. Bukolikat, Gjergjikat dhe Eneida formojnë triptikun e tij madhor. Dante do ta zgjidh si udhërrëfyes nëpër ferr — simbol i urtësisë njerëzore të shpëtuar nga feja.</p>
+          </div>
+        </div>
+
+        <div class="page-num">— V —</div>
+      </div>
+
+      <!-- SPINE -->
+      <div class="spine"></div>
+
+      <!-- RIGHT -->
+      <div class="page right">
+        <div class="page-lines"></div>
+
+        <div class="section-label">Vazhdim · Autorët</div>
+        <h2 class="chapter-title">Mendimtarët & <span>Poetët</span></h2>
+
+        <div class="author-card">
+          <div class="author-bust">🎭</div>
+          <div class="author-info">
+            <h3>Platoni — Πλάτων</h3>
+            <div class="dates">428 – 348 P.E.S. · Athinë · Filozof</div>
+            <p>Nxënësi i Sokratit, mësuesi i Aristotelit. Krijoi akademinë e parë universitare. Dialogjet e tij — Republika, Menoni, Fedoni — janë kryevepra si filozofie ashtu edhe si letërsi. Socrati fliste; Platoni shkruante.</p>
+          </div>
+        </div>
+
+        <div class="author-card">
+          <div class="author-bust">⚖️</div>
+          <div class="author-info">
+            <h3>Aristoteli — Ἀριστοτέλης</h3>
+            <div class="dates">384 – 322 P.E.S. · Stageirë · Filozof Universal</div>
+            <p>Enciklopedisti i botës antike. Poetika e tij — vepra e parë e teorisë letrare — definoi tragjedinë, komedi dhe epikën. Mësuesi i Aleksandrit të Madh. Veprat e tij mbulojnë çdo fushë — nga biologjia te etika.</p>
+          </div>
+        </div>
+
+        <div class="author-card">
+          <div class="author-bust">✨</div>
+          <div class="author-info">
+            <h3>Ovidi — Publius Ovidius Naso</h3>
+            <div class="dates">43 P.E.S. – 17 P.E.S. · Romë · Poet</div>
+            <p>Poeti i dashurisë dhe transformimit. Ars Amatoria, Amores dhe Metamorfozat. Dëbuar nga Romi nga Augusti për arsye misterioze — ndoshta çmorali, ndoshta politikë. Vdiq në mërgim, por fama e tij mbijetoi Augustin.</p>
+          </div>
+        </div>
+
+        <div class="author-card">
+          <div class="author-bust">📚</div>
+          <div class="author-info">
+            <h3>Euripidi — Εὐριπίδης</h3>
+            <div class="dates">480 – 406 P.E.S. · Athinë · Tragjed Inovator</div>
+            <p>Shkroi 92 drama; 18 kanë mbijetuar — numri më i lartë i çdo tragjedu antik. Revolucionarizoi tragjedinë duke i bërë gratë dhe skllevërit protagonistë. Medea e tij është akuza e parë feministe e letërsisë botërore.</p>
+          </div>
+        </div>
+
+        <div class="ornament">✦ ✦ ✦</div>
+
+        <p class="body-text" style="font-size:0.8rem">
+          Autorë të tjerë thelbësorë: <strong>Horaci</strong> (lirika romake), <strong>Herodoti</strong> (ati i historisë), <strong>Tukididi</strong> (historia shkencore), <strong>Ciceroni</strong> (oratori romake), <strong>Safoja</strong> (poezia lirike greke, zëri i parë femëror), <strong>Lukrecji</strong> (filozofia epikureane), <strong>Marku Aurel</strong> (stoicizmi).
+        </p>
+
+        <div class="page-num">— VI —</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="visual-divider"></div>
+
+  <!-- ══ SPREAD 4: SHPREHJET E URTA ══ -->
+  <div class="spread-wrapper reveal" id="section-4">
+    <div class="page-label">Faqja IV — Shprehjet e Urta</div>
+    <div class="book-spread">
+      <!-- LEFT -->
+      <div class="page left">
+        <div class="page-lines"></div>
+
+        <div class="section-label">Kapitulli IV</div>
+        <h2 class="chapter-title">Fjalë të <span>Arta</span></h2>
+
+        <p class="body-text">
+          Fjalët e autorëve antikë kanë gjithë urtësinë që nevojitej atëherë — dhe ende nevojitet sot. Ato nuk janë citate të brishta — janë thënie të forjuara nga ndërgjegjja njerëzore mbi zjarrin e përvojës.
+        </p>
+
+        <div class="quote-block">
+          <p>"Njohu vetveten."</p>
+          <div class="q-attr">— Sokrati (Inscripted in Delphi) / Σωκράτης</div>
+        </div>
+
+        <div class="quote-block">
+          <p>"Rruga drejt zënies së zemrës së popujve kalon nëpër veshët e tyre."</p>
+          <div class="q-attr">— Ciceroni / Marcus Tullius Cicero</div>
+        </div>
+
+        <div class="quote-block">
+          <p>"Durim dhe kohë — dy luftëtarët më të fuqishëm."</p>
+          <div class="q-attr">— Ovidi / Metamorphoses</div>
+        </div>
+
+        <div class="quote-block">
+          <p>"Jeta e pashqyrtuar nuk ia vlen të jetohet."</p>
+          <div class="q-attr">— Sokrati / sipas Platonit, Apologia</div>
+        </div>
+
+        <div class="quote-block">
+          <p>"Mba mend se je mortal."<br><em style="font-size:0.85em; opacity:0.7">"Memento mori."</em></p>
+          <div class="q-attr">— Shprehje latine stoike</div>
+        </div>
+
+        <div class="quote-block">
+          <p>"Njeriu është masë e të gjitha gjërave."</p>
+          <div class="q-attr">— Protagora / Πρωταγόρας · Sofist</div>
+        </div>
+
+        <div class="ornament">— ✦ —</div>
+
+        <div class="quote-block">
+          <p>"Dashuria e ekziston, edhe pse mendja thotë jo."</p>
+          <div class="q-attr">— Ovidi / Ars Amatoria</div>
+        </div>
+
+        <div class="page-num">— VII —</div>
+      </div>
+
+      <!-- SPINE -->
+      <div class="spine"></div>
+
+      <!-- RIGHT -->
+      <div class="page right">
+        <div class="page-lines"></div>
+
+        <div class="section-label">Vazhdim · Urtësia Antike</div>
+        <h2 class="chapter-title">Zëri i <span>Shekujve</span></h2>
+
+        <div class="quote-block">
+          <p>"Edukimi është ndezja e një flake, jo mbushja e një ene."</p>
+          <div class="q-attr">— Plutarku / Πλούταρχος · Biografi</div>
+        </div>
+
+        <div class="quote-block">
+          <p>"Nuk ka asgjë të re nën diell."</p>
+          <div class="q-attr">— Predikuesi (Ekleziastiku) / Letërsia Hebraike Antike</div>
+        </div>
+
+        <div class="quote-block">
+          <p>"Fortuna ndihmon të guximshmit."<br><em style="font-size:0.85em; opacity:0.7">"Audentes fortuna iuvat."</em></p>
+          <div class="q-attr">— Virgjili / Eneida, Libri X</div>
+        </div>
+
+        <div class="quote-block">
+          <p>"Ars longa, vita brevis — Arti është i gjatë, jeta e shkurtër."</p>
+          <div class="q-attr">— Hipokrati / sipas Senekës</div>
+        </div>
+
+        <div class="quote-block">
+          <p>"Është e vështirë të parashikosh, sidomos të ardhmen."</p>
+          <div class="q-attr">— Horaci / Carmina</div>
+        </div>
+
+        <div class="quote-block">
+          <p>"Zoti na dha gjuhën për të fshehur mendimet tona — mençuria qëndron në zbulimin e tyre."</p>
+          <div class="q-attr">— Euripidi / Fragment i humbur</div>
+        </div>
+
+        <div class="quote-block">
+          <p>"Shumica e njerëzve i durojnë filozofët si fqinjë — pa i thirrur asnjëherë."</p>
+          <div class="q-attr">— Aristofani / Retë · Komedi satirike</div>
+        </div>
+
+        <div class="ornament">❧ ✦ ❧</div>
+
+        <div class="illuminated">
+          <p class="body-text" style="margin:0; font-size:0.85rem; font-style:italic">
+            "Carpe diem, quam minimum credula postero" — "Kap ditën, duke besuar sa më pak nesërës." Kjo shprehje e Horacit është ndoshta thënia latine më e njohur e gjithë historisë, duke mishëruar filozofinë epikureane të momentit të jetueshëm plotësisht.
+          </p>
+          <div class="q-attr" style="text-align:right; margin-top:8px; font-family:'Cinzel', serif; font-size:0.72rem; color:var(--gold)">— Horaci / Odes I.11</div>
+        </div>
+
+        <div class="page-num">— VIII —</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="visual-divider"></div>
+
+  <!-- ══ SPREAD 5: TRASHËGIMIA ══ -->
+  <div class="spread-wrapper reveal" id="section-5">
+    <div class="page-label">Faqja V — Trashëgimia & Mbyllja</div>
+    <div class="book-spread">
+      <!-- LEFT -->
+      <div class="page left">
+        <div class="page-lines"></div>
+
+        <div class="section-label">Kapitulli V</div>
+        <h2 class="chapter-title"><span>Trashëgimia</span> e Amshuar</h2>
+
+        <p class="body-text">
+          <span class="dropcap">T</span>rashëgimia e letërsisë antike nuk është arkivale — është gjallëritëse. Çdo herë që shkruajmë një roman, vizitojmë teatrin apo debatojmë demokracinë, jemi debitorë të botëve që Homeri, Platoni dhe Virgjili ndërtuan me fjalë.
+        </p>
+
+        <div class="illuminated">
+          <h3 style="font-family:'Cinzel', serif; font-size:0.95rem; color:var(--ink); margin-bottom:8px">Ndikimi i Gjinive Letrare</h3>
+          <table class="period-table" style="margin:0">
+            <thead><tr><th>Gjinia</th><th>Origjina</th><th>Sot</th></tr></thead>
+            <tbody>
+              <tr><td>Tragedia</td><td>Athinë V shek.</td><td>Drama moderne, film</td></tr>
+              <tr><td>Epika</td><td>Homeri</td><td>Romani historik, fantasy</td></tr>
+              <tr><td>Lirika</td><td>Safo, Horaci</td><td>Muzika, poezia moderne</td></tr>
+              <tr><td>Komedia</td><td>Aristofani</td><td>Satira, stand-up</td></tr>
+              <tr><td>Filozofia</td><td>Platoni</td><td>Etika, politika, psikologjia</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="body-text">
+          Shekulli i Rilindjes (XV–XVI) e rindërtoi antikitetin. Renesança ishte, në thelb, bisedë e gjatë me Romën dhe Greqinë. Shkrimtarët si Petrarca, Boccaccio, dhe Erasmus mësonin latinisht për të pirë nga burimi i drejtpërdrejtë.
+        </p>
+
+        <div class="quote-block">
+          <p>"Nëse kam parë larg, ka qenë sepse qëndrova mbi supet e gjigantëve."</p>
+          <div class="q-attr">— Isaac Newton · duke iu referuar mendimtarëve antikë</div>
+        </div>
+
+        <p class="body-text">
+          Dante e zgjodhi Virgjilin si udhëzuesin e tij nëpër Infernon. Shekspiri i mori historitë e tij nga Plutarku. Freudi mori emrin "kompleks Edipi" nga Sofokli. Antikiteti nuk ka vdekur — ai gjendet brenda nesh.
+        </p>
+
+        <div class="page-num">— IX —</div>
+      </div>
+
+      <!-- SPINE -->
+      <div class="spine"></div>
+
+      <!-- RIGHT -->
+      <div class="page right">
+        <div class="page-lines"></div>
+
+        <div class="section-label">Fjalë Mbyllëse</div>
+        <h2 class="chapter-title">Libri <span>Mbyllet</span></h2>
+
+        <div class="ancient-img" style="margin-bottom:20px">
+          🏛️🌊📜
+          <span>Mediterrani antik — Djepi i Letërsisë</span>
+        </div>
+
+        <p class="body-text">
+          Letërsia antike nuk është vetëm historia e dikujt tjetër. Është historia jonë — njerëzore, universale, e pandarë. Njeriu që shkroi Gilgameshin 4000 vjet më parë kishte të njëjtat frikë e shpresa si ne sot: nuk donte të vdiste, dashuronte, luftonte dhe pyeste "Pse?"
+        </p>
+
+        <div class="two-col">
+          <div>
+            <div class="section-label" style="font-size:0.55rem">Greqia</div>
+            <p class="body-text" style="font-size:0.8rem">🏺 Athinë · Spartë · Korint<br>Teatri · Filozofia · Olimpi</p>
+          </div>
+          <div>
+            <div class="section-label" style="font-size:0.55rem">Roma</div>
+            <p class="body-text" style="font-size:0.8rem">🏛️ Forum · Senat · Koloseum<br>Ligji · Oratori · Epi</p>
+          </div>
+        </div>
+
+        <div class="ornament">— ✦ —</div>
+
+        <div class="illuminated">
+          <p class="body-text" style="margin:0; font-style:italic; font-size:0.9rem">
+            "Letrat antike janë si rrënjët e pemës — nuk i shoh, por mbajtja prej tyre është jeta ime. Pa Homerin nuk ka Virgjilin. Pa Virgjilin nuk ka Danten. Pa Danten nuk ka Shekspirin. Zinxhiri nuk prishet — ai shtohet."
+          </p>
+        </div>
+
+        <div class="ornament" style="margin-top:20px">❦ FINIS ❦</div>
+
+        <p class="body-text" style="text-align:center; font-family:'Cinzel', serif; font-size:0.8rem; letter-spacing:0.2em; margin-top:10px">
+          ΑΡΧΗ ΚΑΙ ΤΕΛΟΣ<br>
+          <span style="font-size:0.7rem; opacity:0.6">Fillimi dhe Fundi</span>
+        </p>
+
+        <div class="page-num">— X —</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOOK FOOTER -->
+  <div class="book-footer reveal">
+    ✦ Letërsia në Antikitet · Volumen Primum · Faqosur me Dashurinë e Kulturës ✦
+  </div>
+
+</div><!-- /book-container -->
+
+<script>
+// ── STARS ──
+(function() {
+  const s = document.getElementById('stars');
+  for (let i = 0; i < 120; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = Math.random() * 2 + 0.5;
+    star.style.cssText = `
+      left:${Math.random()*100}%;
+      top:${Math.random()*100}%;
+      width:${size}px; height:${size}px;
+      --dur:${2 + Math.random()*4}s;
+      --min-op:${0.1 + Math.random()*0.2};
+      --max-op:${0.4 + Math.random()*0.5};
+      animation-delay:${Math.random()*4}s;
+    `;
+    s.appendChild(star);
+  }
+})();
+
+// ── SCROLL REVEAL ──
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); }
+  });
+}, { threshold: 0.08 });
+reveals.forEach(r => observer.observe(r));
+
+// ── READING PROGRESS ──
+const bar = document.getElementById('reading-progress');
+window.addEventListener('scroll', () => {
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  bar.style.width = (window.scrollY / max * 100) + '%';
+}, { passive: true });
+
+// ── HIDE SCROLL GUIDE ──
+const guide = document.getElementById('scroll-guide');
+window.addEventListener('scroll', () => {
+  guide.classList.toggle('hidden', window.scrollY > 120);
+}, { passive: true });
+
+// ── NAV DOTS ──
+const sections = Array.from(document.querySelectorAll('[id^="section-"]'));
+const dots = document.querySelectorAll('.nav-dot');
+window.addEventListener('scroll', () => {
+  let cur = 0;
+  sections.forEach((s, i) => {
+    if (window.scrollY >= s.offsetTop - 200) cur = i;
+  });
+  dots.forEach((d, i) => d.classList.toggle('active', i === cur));
+}, { passive: true });
+
+function scrollToSection(i) {
+  sections[i]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── GOLDEN SPARKS ON CLICK ──
+document.addEventListener('click', (e) => {
+  for (let i = 0; i < 8; i++) {
+    const p = document.createElement('div');
+    p.className = 'spark';
+    p.style.cssText = `left:${e.clientX}px;top:${e.clientY}px;position:fixed;z-index:9999;
+      width:${3+Math.random()*4}px;height:${3+Math.random()*4}px;border-radius:50%;
+      background:hsl(${40+Math.random()*20},100%,${60+Math.random()*20}%);
+      pointer-events:none;`;
+    document.body.appendChild(p);
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 60 + Math.random() * 80;
+    let x = 0, y = 0, opacity = 1;
+    const anim = setInterval(() => {
+      x += Math.cos(angle) * 3;
+      y += Math.sin(angle) * 3 + 1;
+      opacity -= 0.05;
+      p.style.transform = `translate(${x}px,${y}px)`;
+      p.style.opacity = opacity;
+      if (opacity <= 0) { clearInterval(anim); p.remove(); }
+    }, 16);
+  }
+});
+
+// ── PAGE HOVER TILT ──
+document.querySelectorAll('.book-spread').forEach(b => {
+  b.addEventListener('mousemove', (e) => {
+    const r = b.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    b.style.transform = `perspective(1500px) rotateY(${x*2}deg) rotateX(${-y*1}deg) scale(1.003)`;
+  });
+  b.addEventListener('mouseleave', () => {
+    b.style.transform = '';
+  });
+});
+
+// ── ANIMATED ENTRANCE FOR AUTHOR CARDS ──
+const cards = document.querySelectorAll('.author-card, .work-card');
+const cardObs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateX(0)';
+      }, i * 80);
+    }
+  });
+}, { threshold: 0.1 });
+cards.forEach(c => {
+  c.style.opacity = '0';
+  c.style.transform = 'translateX(-12px)';
+  c.style.transition = 'opacity 0.5s ease, transform 0.5s ease, border-color 0.3s ease, box-shadow 0.3s ease';
+  cardObs.observe(c);
+});
+
+// ── AMBIENT GOLDEN DUST ──
+(function spawnDust() {
+  if (Math.random() < 0.4) {
+    const p = document.createElement('div');
+    p.style.cssText = `
+      position:fixed; pointer-events:none; z-index:1;
+      left:${Math.random()*100}vw; top:110vh;
+      width:${1+Math.random()*2}px; height:${1+Math.random()*2}px;
+      border-radius:50%; opacity:0;
+      background:hsl(${40+Math.random()*15},100%,70%);
+    `;
+    document.body.appendChild(p);
+    const dur = 8000 + Math.random() * 6000;
+    const x = (Math.random()-0.5)*60;
+    p.animate([
+      { transform: 'translateY(0) translateX(0)', opacity: 0 },
+      { opacity: 0.4, offset: 0.1 },
+      { transform: `translateY(-110vh) translateX(${x}px)`, opacity: 0 }
+    ], { duration: dur, easing: 'ease-in-out' }).onfinish = () => p.remove();
+  }
+  setTimeout(spawnDust, 200);
+})();
+
+// ── QUOTE BLOCKS GLOW ON HOVER ──
+document.querySelectorAll('.quote-block').forEach(q => {
+  q.style.transition = 'background 0.3s ease, box-shadow 0.3s ease';
+  q.addEventListener('mouseenter', () => {
+    q.style.background = 'rgba(200,146,42,0.12)';
+    q.style.boxShadow = '0 2px 15px rgba(200,146,42,0.1)';
+  });
+  q.addEventListener('mouseleave', () => {
+    q.style.background = 'rgba(200,146,42,0.06)';
+    q.style.boxShadow = 'none';
+  });
+});
+</script>
+</body>
+</html>
