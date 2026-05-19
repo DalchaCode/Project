@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mandalat & Mozaiku — Arte e Lashtë</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06060e;--gold:#c9a84c;--gold-l:#e8c97a;--ivory:#f2e8d9;--dim:#b0a898;--card:#0e0e1c;--border:rgba(201,168,76,0.18)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ivory);font-family:'Cormorant Garamond',Georgia,serif;cursor:none;overflow-x:hidden}
+#cur{position:fixed;width:10px;height:10px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .15s,height .15s}
+#cur-ring{position:fixed;width:38px;height:38px;border:1.5px solid var(--gold);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left .08s,top .08s,width .3s,height .3s,opacity .3s;opacity:.5}
+body.ch #cur{width:18px;height:18px}
+body.ch #cur-ring{width:54px;height:54px;opacity:.25}
+
+/* NAV */
+nav{position:fixed;top:0;width:100%;z-index:1000;padding:26px 64px;display:flex;justify-content:space-between;align-items:center;transition:background .4s,padding .4s,border .4s}
+nav.s{background:rgba(6,6,14,.94);backdrop-filter:blur(20px);padding:18px 64px;border-bottom:1px solid var(--border)}
+.nav-logo{font-family:'Cinzel Decorative',serif;font-size:1rem;color:var(--gold);letter-spacing:2px;text-decoration:none}
+.nav-links{display:flex;gap:44px;list-style:none}
+.nav-links a{font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color .3s}
+.nav-links a:hover{color:var(--gold)}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(44px);transition:opacity .85s ease,transform .85s ease}
+.rv.on{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
+
+/* HERO */
+#hero{position:relative;height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden}
+#hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 50% 50%,rgba(100,60,10,.25),transparent)}
+#hero-svg{position:absolute;width:85vmin;height:85vmin;opacity:.12;animation:spin 80s linear infinite}
+#hero-svg2{position:absolute;width:55vmin;height:55vmin;opacity:.18;animation:spin 50s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hero-c{position:relative;z-index:2}
+.hero-eye{font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:6px;text-transform:uppercase;color:var(--gold);margin-bottom:22px;animation:fu 1.2s ease .3s both}
+.hero-title{font-family:'Cinzel Decorative',serif;font-size:clamp(2.2rem,8vw,6rem);font-weight:900;line-height:1.05;margin-bottom:20px;animation:fu 1.2s ease .6s both}
+.hero-title span{color:var(--gold)}
+.hero-sub{font-size:clamp(1rem,2vw,1.3rem);font-weight:300;font-style:italic;color:var(--dim);max-width:480px;margin:0 auto 48px;animation:fu 1.2s ease .9s both}
+.hero-btn{display:inline-block;font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:3px;text-transform:uppercase;color:var(--bg);background:var(--gold);padding:16px 42px;text-decoration:none;transition:background .3s,transform .25s;animation:fu 1.2s ease 1.2s both}
+.hero-btn:hover{background:var(--gold-l);transform:translateY(-2px)}
+@keyframes fu{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.scroll-ind{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;animation:bk 2.5s ease infinite}
+@keyframes bk{0%,100%{transform:translateX(-50%) translateY(0);opacity:.4}50%{transform:translateX(-50%) translateY(8px);opacity:.7}}
+.scroll-ln{width:1px;height:48px;background:linear-gradient(to bottom,var(--gold),transparent)}
+.scroll-t{font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:3px;color:var(--gold);writing-mode:vertical-lr}
+
+/* COMMON SECTION STYLES */
+section{padding:120px 64px}
+.s-eye{font-family:'Cinzel',serif;font-size:.68rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.s-title{font-family:'Cinzel Decorative',serif;font-size:clamp(1.6rem,4vw,2.8rem);font-weight:700;line-height:1.2;margin-bottom:22px}
+.s-body{font-size:1.12rem;font-weight:300;line-height:1.92;color:var(--dim);max-width:580px}
+.gold-line{width:56px;height:1px;background:var(--gold);margin:20px 0}
+.btn{font-family:'Cinzel',serif;font-size:.68rem;letter-spacing:2px;text-transform:uppercase;padding:12px 28px;border:1px solid var(--gold);background:transparent;color:var(--gold);cursor:pointer;transition:background .25s,color .25s}
+.btn:hover,.btn.p{background:var(--gold);color:var(--bg)}
+.btn.p:hover{background:var(--gold-l)}
+
+/* ABOUT */
+#about{display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center}
+.about-img{position:relative;aspect-ratio:.78;overflow:hidden}
+.about-img img{width:100%;height:100%;object-fit:cover;filter:saturate(70%);transition:transform .8s,filter .8s}
+.about-img:hover img{transform:scale(1.04);filter:saturate(100%)}
+.about-img::before{content:'';position:absolute;inset:0;border:1px solid var(--border);z-index:1;pointer-events:none}
+.about-img::after{content:'';position:absolute;inset:14px;border:1px solid var(--border);z-index:1;pointer-events:none}
+.stat-row{display:flex;gap:48px;margin-top:36px}
+.stat-item .num{font-family:'Cinzel Decorative',serif;font-size:2.2rem;color:var(--gold)}
+.stat-item .lbl{font-family:'Cinzel',serif;font-size:.62rem;letter-spacing:2px;color:var(--dim);margin-top:2px}
+
+/* HISTORY */
+#history{background:var(--card)}
+.tl-wrap{position:relative;max-width:860px;margin:60px auto 0}
+.tl-wrap::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,var(--gold) 20%,var(--gold) 80%,transparent);transform:translateX(-50%)}
+.tl-item{display:grid;grid-template-columns:1fr 48px 1fr;margin-bottom:56px}
+.tl-card{padding:26px;background:rgba(201,168,76,.03);border:1px solid var(--border);transition:background .3s,border-color .3s}
+.tl-card:hover{background:rgba(201,168,76,.07);border-color:rgba(201,168,76,.4)}
+.tl-right{grid-column:3}
+.tl-empty{grid-column:1}
+.tl-dot{display:flex;align-items:center;justify-content:center;padding-top:22px}
+.tl-dot-in{width:12px;height:12px;background:var(--gold);border-radius:50%;border:3px solid var(--bg);box-shadow:0 0 0 1px var(--gold)}
+.tl-yr{font-family:'Cinzel',serif;font-size:.65rem;letter-spacing:2px;color:var(--gold);margin-bottom:6px}
+.tl-h{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;margin-bottom:6px}
+.tl-p{font-size:.95rem;line-height:1.7;color:var(--dim)}
+
+/* COLORING GAME */
+#coloring{background:#060610;text-align:center}
+#coloring-wrap{display:flex;flex-direction:column;align-items:center;gap:28px}
+#coloring-svg-box{width:min(520px,88vw);height:min(520px,88vw);position:relative}
+#col-svg{width:100%;height:100%;filter:drop-shadow(0 0 50px rgba(201,168,76,.18))}
+#col-svg .z{cursor:pointer;stroke:#06060e;stroke-width:1.5;transition:opacity .18s}
+#col-svg .z:hover{opacity:.75;stroke:#c9a84c;stroke-width:2}
+.palette{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:440px}
+.sw{width:34px;height:34px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .2s,box-shadow .2s}
+.sw:hover{transform:scale(1.14)}
+.sw.sel{border-color:var(--ivory);transform:scale(1.22);box-shadow:0 0 0 3px var(--gold)}
+.game-btns{display:flex;gap:14px}
+.color-hint{font-family:'Cinzel',serif;font-size:.65rem;letter-spacing:2px;color:var(--dim);margin-top:-12px}
+
+/* MOSAIC BUILDER */
+#mosaic{background:var(--card);text-align:center}
+#mosaic-wrap{display:flex;flex-direction:column;align-items:center;gap:24px}
+#mos-canvas{border:1px solid var(--border);cursor:crosshair;image-rendering:pixelated;box-shadow:0 0 60px rgba(201,168,76,.1)}
+.mos-pal{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:380px}
+.msw{width:30px;height:30px;border-radius:4px;cursor:pointer;border:2px solid transparent;transition:transform .2s}
+.msw:hover{transform:scale(1.12)}
+.msw.sel{border-color:#fff;transform:scale(1.18)}
+.mos-tool-row{display:flex;gap:12px;align-items:center}
+.mos-size-lbl{font-family:'Cinzel',serif;font-size:.65rem;letter-spacing:1.5px;color:var(--dim)}
+
+/* GALLERY */
+#gallery{text-align:center}
+.gal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;max-width:1060px;margin:48px auto 0}
+.gal-item{position:relative;overflow:hidden}
+.gal-item:nth-child(1){grid-column:span 2;aspect-ratio:2/1.1}
+.gal-item:nth-child(2){aspect-ratio:.85}
+.gal-item:nth-child(3){aspect-ratio:.85}
+.gal-item:nth-child(4){grid-column:span 2;aspect-ratio:2/1}
+.gal-item:nth-child(5){aspect-ratio:1}
+.gal-item:nth-child(6){aspect-ratio:1}
+.gal-item img{width:100%;height:100%;object-fit:cover;filter:saturate(75%);transition:transform .6s,filter .6s}
+.gal-item:hover img{transform:scale(1.06);filter:saturate(105%)}
+.gal-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7),transparent);opacity:0;transition:opacity .3s;display:flex;align-items:flex-end;padding:20px}
+.gal-item:hover .gal-ov{opacity:1}
+.gal-cap{font-family:'Cinzel',serif;font-size:.62rem;letter-spacing:2px;color:var(--ivory)}
+
+/* MEMORY GAME */
+#memory{background:#060610;text-align:center}
+#mem-board{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:560px;margin:40px auto 0}
+.mc{aspect-ratio:1;position:relative;cursor:pointer;perspective:700px}
+.mc-in{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,0,.2,1)}
+.mc.fl .mc-in{transform:rotateY(180deg)}
+.mc-front,.mc-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.mc-back{transform:rotateY(180deg);background:var(--card);border:1px solid var(--border)}
+.mc-front{background:linear-gradient(135deg,#12102a,#0a0818);border:1px solid rgba(201,168,76,.28)}
+.mc-front svg{width:65%;height:65%}
+#mem-stat{font-family:'Cinzel',serif;font-size:.75rem;letter-spacing:2px;color:var(--gold);margin-top:20px;min-height:1.2em}
+#mem-win{display:none;text-align:center;padding:32px}
+#mem-win .big{font-family:'Cinzel Decorative',serif;font-size:2rem;color:var(--gold);margin-bottom:8px}
+
+/* QUIZ */
+#quiz{background:var(--card)}
+.quiz-inner{max-width:680px;margin:40px auto 0}
+.quiz-prog{font-family:'Cinzel',serif;font-size:.65rem;letter-spacing:2px;color:var(--gold);margin-bottom:18px}
+.quiz-q{font-size:1.35rem;font-weight:400;line-height:1.55;margin-bottom:28px}
+.quiz-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:28px}
+.qo{padding:16px 18px;background:rgba(201,168,76,.03);border:1px solid var(--border);color:var(--dim);font-family:'Cormorant Garamond',serif;font-size:1.05rem;cursor:pointer;text-align:left;transition:border-color .2s,background .2s,color .2s;line-height:1.4}
+.qo:hover{border-color:var(--gold);color:var(--ivory);background:rgba(201,168,76,.08)}
+.qo.ok{border-color:#4caf50;background:rgba(76,175,80,.1);color:#81c784;pointer-events:none}
+.qo.no{border-color:#e57373;background:rgba(229,115,115,.08);color:#e57373;pointer-events:none}
+.qo.reveal{pointer-events:none}
+#quiz-exp{font-style:italic;color:var(--dim);margin-bottom:24px;min-height:2em;font-size:.95rem;line-height:1.6}
+#quiz-res{display:none;text-align:center;padding:48px 20px}
+.res-num{font-family:'Cinzel Decorative',serif;font-size:5rem;color:var(--gold);line-height:1}
+.res-lbl{font-family:'Cinzel',serif;font-size:.75rem;letter-spacing:3px;color:var(--dim);margin:8px 0 24px}
+.res-msg{font-style:italic;font-size:1.2rem;color:var(--ivory-dim);max-width:400px;margin:0 auto 32px}
+
+/* FOOTER */
+footer{background:#030307;padding:80px 64px 44px;text-align:center;border-top:1px solid var(--border)}
+.ft-logo{font-family:'Cinzel Decorative',serif;font-size:1.2rem;color:var(--gold);letter-spacing:3px;margin-bottom:20px}
+.ft-txt{font-size:.95rem;color:var(--dim);max-width:380px;margin:0 auto 40px;font-style:italic;line-height:1.85}
+.ft-div{width:56px;height:1px;background:var(--border);margin:40px auto}
+.ft-copy{font-family:'Cinzel',serif;font-size:.58rem;letter-spacing:2px;color:rgba(201,168,76,.28)}
+
+/* PARTICLES */
+#ptc{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.35}
+
+@media(max-width:768px){
+  nav{padding:20px 24px}
+  .nav-links{display:none}
+  section{padding:80px 24px}
+  #about{grid-template-columns:1fr}
+  .about-img{max-height:380px}
+  .gal-grid{grid-template-columns:1fr 1fr}
+  .gal-item:nth-child(1),.gal-item:nth-child(4){grid-column:span 2}
+  .quiz-opts{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<canvas id="ptc"></canvas>
+<div id="cur"></div>
+<div id="cur-ring"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">M & M</a>
+  <ul class="nav-links">
+    <li><a href="#about">Rreth</a></li>
+    <li><a href="#history">Historia</a></li>
+    <li><a href="#coloring">Ngjyros</a></li>
+    <li><a href="#mosaic">Mozaiku</a></li>
+    <li><a href="#memory">Kujtesa</a></li>
+    <li><a href="#quiz">Quiz</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div id="hero-bg"></div>
+  <svg id="hero-svg" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+  <svg id="hero-svg2" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div class="hero-c">
+    <div class="hero-eye">Arte e Lashtë Botërore</div>
+    <h1 class="hero-title">Mandalat<br>&amp; <span>Mozaiku</span></h1>
+    <p class="hero-sub">Zbulo bukurinë e artit që ka rrethuar njeriun për mijëra vjet — simetri, ngjyra dhe kuptim.</p>
+    <a href="#about" class="hero-btn">Zbulo Tani</a>
+  </div>
+  <div class="scroll-ind">
+    <div class="scroll-ln"></div>
+    <div class="scroll-t">Lëviz</div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-img rv">
+    <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=700&q=80" alt="Mandala" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'700\' height=\'900\' style=\'background:%230e0e1c\'><text x=\'50%\' y=\'50%\' fill=\'%23c9a84c\' text-anchor=\'middle\' font-size=\'40\'>✦</text></svg>'">
+  </div>
+  <div class="about-txt">
+    <div class="s-eye rv">Çfarë Janë</div>
+    <h2 class="s-title rv d1">Arti i Simetrisë<br>dhe Kuptimit</h2>
+    <div class="gold-line rv d2"></div>
+    <p class="s-body rv d2">
+      <strong style="color:var(--ivory)">Mandalat</strong> janë figura gjeometrike rrethorë që simbolizojnë universin në hinduizmin dhe budizmin. Fjala "mandala" vjen nga sanskritishtja dhe do të thotë "rreth i shenjtë". Ato janë përdorur si mjete meditimi dhe arti shpirtëror për mbi 2500 vjet.
+    </p>
+    <p class="s-body rv d3" style="margin-top:18px">
+      <strong style="color:var(--ivory)">Mozaiku</strong> është arti i krijimit të imazheve duke bashkuar copëza të vogla — guri, xhami, qeramike — në një sipërfaqe. Qytetërimet e lashta romake, bizantine dhe islamike la mozaikë të mrekullueshëm që ekzistojnë deri sot.
+    </p>
+    <div class="stat-row rv d4">
+      <div class="stat-item"><div class="num">2500</div><div class="lbl">Vjet Histori</div></div>
+      <div class="stat-item"><div class="num">48</div><div class="lbl">Kultura Botërore</div></div>
+      <div class="stat-item"><div class="num">∞</div><div class="lbl">Mundësi Krijuese</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- HISTORY -->
+<section id="history">
+  <div class="s-eye rv" style="text-align:center">Udha e Kohës</div>
+  <h2 class="s-title rv d1" style="text-align:center">Historia e Artit</h2>
+  <div class="tl-wrap" id="timeline-wrap">
+    <!-- generated by JS -->
+  </div>
+</section>
+
+<!-- COLORING GAME -->
+<section id="coloring">
+  <div class="s-eye rv">Eksploro me Ngjyra</div>
+  <h2 class="s-title rv d1">Ngjyros Mandalën</h2>
+  <p class="s-body rv d2" style="margin:0 auto 40px;text-align:center">Kliko mbi çdo zonë dhe zgjidh ngjyrën tënde. Krijo mandalën tënde unike!</p>
+  <div id="coloring-wrap">
+    <div id="coloring-svg-box">
+      <svg id="col-svg" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+    <p class="color-hint rv">Zgjidh ngjyrën → Kliko zonën</p>
+    <div class="palette" id="col-pal"></div>
+    <div class="game-btns">
+      <button class="btn" onclick="resetColoring()">Fillo Sëri</button>
+      <button class="btn p" onclick="randomColoring()">Ngjyrë Rastësore</button>
+    </div>
+  </div>
+</section>
+
+<!-- MOSAIC BUILDER -->
+<section id="mosaic">
+  <div class="s-eye rv" style="text-align:center">Krijo me Duart e Tua</div>
+  <h2 class="s-title rv d1" style="text-align:center">Ndërto Mozaikun</h2>
+  <p class="s-body rv d2" style="margin:0 auto 36px;text-align:center">Kliko ose tërhiq mbi rrjetin për të pikturuar. Zgjidh ngjyrën dhe krijo artin tënd!</p>
+  <div id="mosaic-wrap">
+    <canvas id="mos-canvas" width="480" height="480"></canvas>
+    <div class="mos-pal" id="mos-pal"></div>
+    <div class="mos-tool-row">
+      <span class="mos-size-lbl">Madhësia:</span>
+      <input type="range" id="mos-size" min="1" max="5" value="1" style="accent-color:var(--gold);width:100px">
+      <div class="game-btns">
+        <button class="btn" onclick="clearMosaic()">Pastro</button>
+        <button class="btn p" onclick="saveMosaic()">Ruaj Foton</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="s-eye rv">Galeria</div>
+  <h2 class="s-title rv d1">Shembuj nga Bota</h2>
+  <div class="gal-grid rv d2">
+    <div class="gal-item"><img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900&q=80" alt="Mandala e Madhe" loading="lazy" onerror="this.style.background='#1a1028'"><div class="gal-ov"><span class="gal-cap">Mandala Tibetiane</span></div></div>
+    <div class="gal-item"><img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&q=80" alt="Mandala" loading="lazy" onerror="this.style.background='#0e1a28'"><div class="gal-ov"><span class="gal-cap">Arte Indiane</span></div></div>
+    <div class="gal-item"><img src="https://images.unsplash.com/photo-1612686635542-2a52b6f21bb0?w=500&q=80" alt="Mozaiku" loading="lazy" onerror="this.style.background='#1a280e'"><div class="gal-ov"><span class="gal-cap">Mozaiku Islamik</span></div></div>
+    <div class="gal-item"><img src="https://images.unsplash.com/photo-1530026405-4573fb35b3f5?w=900&q=80" alt="Mozaiku Roman" loading="lazy" onerror="this.style.background='#281a0e'"><div class="gal-ov"><span class="gal-cap">Mozaiku Romak</span></div></div>
+    <div class="gal-item"><img src="https://images.unsplash.com/photo-1493246507-ad72534edffa?w=500&q=80" alt="Mozaiku me ngjyra" loading="lazy" onerror="this.style.background='#1a1a28'"><div class="gal-ov"><span class="gal-cap">Qeramikë Tradicionale</span></div></div>
+    <div class="gal-item"><img src="https://images.unsplash.com/photo-1546484396-fb3fc6f95f98?w=500&q=80" alt="Mandala" loading="lazy" onerror="this.style.background='#28100e'"><div class="gal-ov"><span class="gal-cap">Mandala Moderne</span></div></div>
+  </div>
+</section>
+
+<!-- MEMORY GAME -->
+<section id="memory">
+  <div class="s-eye rv" style="text-align:center">Loja e Kujtesës</div>
+  <h2 class="s-title rv d1" style="text-align:center">Gjej Çiftin</h2>
+  <p class="s-body rv d2" style="margin:0 auto;text-align:center">Kliko kartolina për t'i kthyer. Gjej të gjitha çiftet e mandalave!</p>
+  <div id="mem-board"></div>
+  <div id="mem-stat">— Kliko një kartolinë për të filluar —</div>
+  <div id="mem-win">
+    <div class="big">🎉 Bravo!</div>
+    <p style="color:var(--dim);font-style:italic;margin-bottom:24px">Ke gjetur të gjitha çiftet!</p>
+    <button class="btn p" onclick="initMemory()">Lëviz Sëri</button>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz">
+  <div class="s-eye rv" style="text-align:center">Testo Njohuritë</div>
+  <h2 class="s-title rv d1" style="text-align:center">Quiz i Artit</h2>
+  <div class="quiz-inner">
+    <div id="quiz-prog" class="quiz-prog"></div>
+    <div id="quiz-q" class="quiz-q"></div>
+    <div id="quiz-opts" class="quiz-opts"></div>
+    <div id="quiz-exp"></div>
+    <button id="quiz-nxt" class="btn p" style="display:none" onclick="quizNext()">Pyetja Tjetër →</button>
+    <div id="quiz-res">
+      <div class="res-num" id="res-num"></div>
+      <div class="res-lbl">Pikë nga 7</div>
+      <p class="res-msg" id="res-msg"></p>
+      <button class="btn p" onclick="startQuiz()">Provo Sëri</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-logo">Mandalat & Mozaiku</div>
+  <p class="ft-txt">"Arti nuk është gjë tjetër veçse mënyra si shpirti njerëzor prek universin."</p>
+  <div class="ft-div"></div>
+  <div class="ft-copy">© 2024 · Arte e Lashtë Shqipëri · Të gjitha të drejtat e rezervuara</div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════
+// CURSOR
+// ═══════════════════════════════════════
+const cur = document.getElementById('cur');
+const ring = document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+function animRing(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing)}
+animRing();
+document.querySelectorAll('a,button,.sw,.msw,.mc,.qo,.gal-item,.tl-card,.color-swatch').forEach(el=>{
+  el.addEventListener('mouseenter',()=>document.body.classList.add('ch'));
+  el.addEventListener('mouseleave',()=>document.body.classList.remove('ch'));
+});
+
+// ═══════════════════════════════════════
+// NAV SCROLL
+// ═══════════════════════════════════════
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('s',scrollY>60);
+});
+
+// ═══════════════════════════════════════
+// REVEAL ANIMATIONS
+// ═══════════════════════════════════════
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on')});
+},{threshold:.12});
+document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
+
+// ═══════════════════════════════════════
+// PARTICLE BACKGROUND
+// ═══════════════════════════════════════
+(function(){
+  const c=document.getElementById('ptc');
+  const ctx=c.getContext('2d');
+  c.width=innerWidth;c.height=innerHeight;
+  window.addEventListener('resize',()=>{c.width=innerWidth;c.height=innerHeight;initPtc()});
+  const pts=[];
+  function initPtc(){
+    pts.length=0;
+    for(let i=0;i<55;i++)pts.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.2+.3,s:Math.random()*.4+.08,a:Math.random()*Math.PI*2,o:Math.random()*.6+.2});
+  }
+  initPtc();
+  function drawPtc(){
+    ctx.clearRect(0,0,c.width,c.height);
+    pts.forEach(p=>{
+      p.y-=p.s;p.x+=Math.sin(p.a+Date.now()*.0005)*.2;p.a+=.005;
+      if(p.y<-10){p.y=c.height+10;p.x=Math.random()*c.width}
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(201,168,76,${p.o})`;ctx.fill();
+    });
+    requestAnimationFrame(drawPtc);
+  }
+  drawPtc();
+})();
+
+// ═══════════════════════════════════════
+// HERO MANDALA SVG GENERATOR
+// ═══════════════════════════════════════
+(function(){
+  [document.getElementById('hero-svg'),document.getElementById('hero-svg2')].forEach((svg,idx)=>{
+    const cx=300,cy=300,N=idx===0?12:8;
+    const ns='http://www.w3.org/2000/svg';
+    const mk=(tag,attrs)=>{const e=document.createElementNS(ns,tag);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));return e};
+    const rings=idx===0?[40,80,120,160,200,240,280]:[50,100,150,200,240];
+    rings.forEach((r,ri)=>{
+      for(let i=0;i<N;i++){
+        const a=i*(360/N)*Math.PI/180;
+        const a2=(i+1)*(360/N)*Math.PI/180;
+        const x1=cx+r*Math.cos(a),y1=cy+r*Math.sin(a);
+        const x2=cx+(r+35)*Math.cos(a),y2=cy+(r+35)*Math.sin(a);
+        const x3=cx+(r+35)*Math.cos(a2),y3=cy+(r+35)*Math.sin(a2);
+        const x4=cx+r*Math.cos(a2),y4=cy+r*Math.sin(a2);
+        const p=mk('path',{d:`M ${x1} ${y1} L ${x2} ${y2} A ${r+35} ${r+35} 0 0 1 ${x3} ${y3} L ${x4} ${y4} A ${r} ${r} 0 0 0 ${x1} ${y1} Z`,fill:'none',stroke:'rgba(201,168,76,0.9)','stroke-width':'.8'});
+        svg.appendChild(p);
+      }
+    });
+    svg.appendChild(mk('circle',{cx,cy,r:28,fill:'none',stroke:'rgba(201,168,76,0.8)','stroke-width':'1'}));
+    svg.appendChild(mk('circle',{cx,cy,r:8,fill:'rgba(201,168,76,0.5)'}));
+  });
+})();
+
+// ═══════════════════════════════════════
+// HISTORY TIMELINE
+// ═══════════════════════════════════════
+const tlData=[
+  {yr:'2500 p.K.',side:'left',h:'Lindja e Mandalës',p:'Mandalat e para njihen në traditat hinduje të Indisë. Tekstet e vjetra Vedike përshkruajnë "yantra" — figura gjeometrike me kuptim shpirtëror.'},
+  {yr:'250 p.K.',side:'right',h:'Mozaiku Grek dhe Romak',p:'Greqia dhe Roma lulëzonin me arte të mozaikut. Podiumet e tempujve dhe shtëpitë patriciane zbukuroheshin me skenat mitologjike nga copëza guri.'},
+  {yr:'400 e.s.',side:'left',h:'Mandalat Budiste',p:'Mandalat u bënë thelbësore në budizmin tantrik. Murgjtë tibetianë krijuan mandalat e rëra — vepra arti madhështore të shkatërruara menjëherë pas plotësimit.'},
+  {yr:'600 e.s.',side:'right',h:'Arte Bizantine',p:'Mozaiku bizantin arriti kulmin e tij. Kisha e Hagia Sofia në Konstandinopojë u mbulua me skenat e shenjta nga 43 milionë copa xhami të artë.'},
+  {yr:'1200 e.s.',side:'left',h:'Arti Islamik',p:'Mandalat dhe mozaiku lulëzuan në botën islamike si arabeska — modele gjeometrike komplekse që zbukuronin xhamitë, pallacat dhe dorëshkrimet.'},
+  {yr:'Sot',side:'right',h:'Arte e Gjallë',p:'Mandalat dhe mozaiku jetojnë sot si forma meditimi, terapie arti dhe krijimtarie. Miliona njerëz në mbarë botën i praktikojnë dhe admirojnë këto arte të lashta.'},
+];
+const tWrap=document.getElementById('timeline-wrap');
+tlData.forEach((d,i)=>{
+  const item=document.createElement('div');item.className='tl-item rv';
+  if(d.side==='left'){
+    item.innerHTML=`<div class="tl-card"><div class="tl-yr">${d.yr}</div><div class="tl-h">${d.h}</div><div class="tl-p">${d.p}</div></div><div class="tl-dot"><div class="tl-dot-in"></div></div><div></div>`;
+  }else{
+    item.innerHTML=`<div></div><div class="tl-dot"><div class="tl-dot-in"></div></div><div class="tl-card tl-right"><div class="tl-yr">${d.yr}</div><div class="tl-h">${d.h}</div><div class="tl-p">${d.p}</div></div>`;
+  }
+  tWrap.appendChild(item);
+  obs.observe(item);
+});
+
+// ═══════════════════════════════════════
+// COLORING GAME
+// ═══════════════════════════════════════
+const SVG_NS='http://www.w3.org/2000/svg';
+const C={cx:300,cy:300};
+const colPalette=['#e63946','#f4a261','#e9c46a','#2a9d8f','#264653','#457b9d','#1d3557','#a8dadc','#e76f51','#d62828','#606c38','#283618','#f2cc8f','#81b29a','#8338ec','#c77dff','#ffffff','#2d2d2d'];
+let selCol='#e63946';
+const zones=[];
+
+function mkEl(tag,attrs){const e=document.createElementNS(SVG_NS,tag);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));return e}
+
+function sectorPath(r1,r2,a1Deg,a2Deg){
+  const toR=a=>a*Math.PI/180;
+  const a1=toR(a1Deg),a2=toR(a2Deg);
+  const x1=C.cx+r1*Math.cos(a1),y1=C.cy+r1*Math.sin(a1);
+  const x2=C.cx+r2*Math.cos(a1),y2=C.cy+r2*Math.sin(a1);
+  const x3=C.cx+r2*Math.cos(a2),y3=C.cy+r2*Math.sin(a2);
+  const x4=C.cx+r1*Math.cos(a2),y4=C.cy+r1*Math.sin(a2);
+  return `M ${x1} ${y1} L ${x2} ${y2} A ${r2} ${r2} 0 0 1 ${x3} ${y3} L ${x4} ${y4} A ${r1} ${r1} 0 0 0 ${x1} ${y1} Z`;
+}
+
+function petalPath(angle, r1, r2, bulge){
+  const a=angle*Math.PI/180;
+  const tipX=C.cx+r2*Math.cos(a),tipY=C.cy+r2*Math.sin(a);
+  const baseX=C.cx+r1*Math.cos(a),baseY=C.cy+r1*Math.sin(a);
+  const perp=angle+90;
+  const pa=perp*Math.PI/180;
+  const mid=(r1+r2)/2;
+  const lx=C.cx+mid*Math.cos(a)+bulge*Math.cos(pa);
+  const ly=C.cy+mid*Math.sin(a)+bulge*Math.sin(pa);
+  const rx2=C.cx+mid*Math.cos(a)-bulge*Math.cos(pa);
+  const ry2=C.cy+mid*Math.sin(a)-bulge*Math.sin(pa);
+  return `M ${baseX} ${baseY} Q ${lx} ${ly} ${tipX} ${tipY} Q ${rx2} ${ry2} ${baseX} ${baseY} Z`;
+}
+
+function buildColoringMandala(){
+  const svg=document.getElementById('col-svg');
+  svg.innerHTML='';
+  zones.length=0;
+  const N=8;
+  const layers=[
+    {type:'circle',r:28,fill:'#1a1a2e',label:'center'},
+    {type:'sector',r1:28,r2:60,seg:N,fill:'#12123c',offset:0},
+    {type:'petal',r1:32,r2:90,seg:N,fill:'#1a1a2e',offset:22.5,bulge:20},
+    {type:'sector',r1:60,r2:100,seg:N,fill:'#0f1030',offset:22.5},
+    {type:'sector',r1:100,r2:140,seg:N,fill:'#12122a',offset:0},
+    {type:'petal',r1:105,r2:175,seg:N,fill:'#1a1a2e',offset:0,bulge:28},
+    {type:'petal',r1:110,r2:185,seg:N,fill:'#0f0f28',offset:22.5,bulge:22},
+    {type:'sector',r1:140,r2:180,seg:N,fill:'#10102a',offset:0},
+    {type:'sector',r1:180,r2:220,seg:N,fill:'#0e0e24',offset:22.5},
+    {type:'circle',r:24,fill:'#0e0e2e',cx_off:0,ry_off:0,outer:220,seg:N},
+  ];
+
+  // Center circle
+  const cc=mkEl('circle',{cx:C.cx,cy:C.cy,r:28,fill:'#1a1a2e',class:'z'});
+  cc.addEventListener('click',()=>{cc.setAttribute('fill',selCol);});
+  svg.appendChild(cc);
+
+  for(let i=0;i<N;i++){
+    const a0=i*(360/N)-90,a1=(i+1)*(360/N)-90;
+    const seg=(360/N);
+
+    // Inner sector
+    const s1=mkEl('path',{d:sectorPath(28,60,a0,a1),fill:'#12123c',class:'z'});
+    s1.addEventListener('click',()=>{s1.setAttribute('fill',selCol)});
+    svg.appendChild(s1);
+
+    // Inner petal
+    const p1=mkEl('path',{d:petalPath(a0+seg/2-90,32,90,20),fill:'#1a1a2e',class:'z'});
+    p1.addEventListener('click',()=>{p1.setAttribute('fill',selCol)});
+    svg.appendChild(p1);
+
+    // Middle sector A
+    const s2=mkEl('path',{d:sectorPath(60,100,a0+22.5,a1+22.5),fill:'#0f1030',class:'z'});
+    s2.addEventListener('click',()=>{s2.setAttribute('fill',selCol)});
+    svg.appendChild(s2);
+
+    // Middle sector B
+    const s3=mkEl('path',{d:sectorPath(100,140,a0,a1),fill:'#12122a',class:'z'});
+    s3.addEventListener('click',()=>{s3.setAttribute('fill',selCol)});
+    svg.appendChild(s3);
+
+    // Outer petal A
+    const p2=mkEl('path',{d:petalPath(a0+seg/2-90,105,175,28),fill:'#1a1a2e',class:'z'});
+    p2.addEventListener('click',()=>{p2.setAttribute('fill',selCol)});
+    svg.appendChild(p2);
+
+    // Outer petal B offset
+    const p3=mkEl('path',{d:petalPath(a0-90,110,182,22),fill:'#0f0f28',class:'z'});
+    p3.addEventListener('click',()=>{p3.setAttribute('fill',selCol)});
+    svg.appendChild(p3);
+
+    // Outer sector A
+    const s4=mkEl('path',{d:sectorPath(140,180,a0,a1),fill:'#10102a',class:'z'});
+    s4.addEventListener('click',()=>{s4.setAttribute('fill',selCol)});
+    svg.appendChild(s4);
+
+    // Outer sector B
+    const s5=mkEl('path',{d:sectorPath(180,222,a0+22.5,a1+22.5),fill:'#0e0e24',class:'z'});
+    s5.addEventListener('click',()=>{s5.setAttribute('fill',selCol)});
+    svg.appendChild(s5);
+
+    // Outer dots
+    const oa=(a0+seg/2)*Math.PI/180;
+    const dotX=C.cx+230*Math.cos(oa),dotY=C.cy+230*Math.sin(oa);
+    const d=mkEl('circle',{cx:dotX,cy:dotY,r:10,fill:'#10102a',class:'z'});
+    d.addEventListener('click',()=>{d.setAttribute('fill',selCol)});
+    svg.appendChild(d);
+  }
+
+  // Decorative rings (non-interactive)
+  [28,60,100,140,180,222,242].forEach(r=>{
+    const ring=mkEl('circle',{cx:C.cx,cy:C.cy,r,fill:'none',stroke:'rgba(201,168,76,0.5)','stroke-width':'1'});
+    svg.appendChild(ring);
+  });
+}
+
+function resetColoring(){buildColoringMandala()}
+function randomColoring(){
+  document.querySelectorAll('#col-svg .z').forEach(z=>{
+    z.setAttribute('fill',colPalette[Math.floor(Math.random()*colPalette.length)]);
+  });
+}
+
+// Build palette
+const colPalWrap=document.getElementById('col-pal');
+colPalette.forEach(c=>{
+  const s=document.createElement('div');
+  s.className='sw color-swatch';s.style.background=c;
+  if(c===selCol)s.classList.add('sel');
+  s.addEventListener('click',()=>{
+    selCol=c;
+    document.querySelectorAll('.sw').forEach(x=>x.classList.remove('sel'));
+    s.classList.add('sel');
+  });
+  colPalWrap.appendChild(s);
+});
+buildColoringMandala();
+
+// ═══════════════════════════════════════
+// MOSAIC BUILDER
+// ═══════════════════════════════════════
+const GRID=32;
+let mosPal=['#c9a84c','#e63946','#f4a261','#2a9d8f','#264653','#457b9d','#8338ec','#c77dff','#ffffff','#1a1a2e','#606c38','#d62828','#e9c46a','#81b29a','#e76f51','#2d2d2d'];
+let mosSel='#c9a84c';
+let mosDown=false;
+let mosGrid=[];
+let mosBrush=1;
+
+const mosCnv=document.getElementById('mos-canvas');
+const mosCtx=mosCnv.getContext('2d');
+const CELL=mosCnv.width/GRID;
+
+function initMosGrid(){mosGrid=Array(GRID).fill(null).map(()=>Array(GRID).fill(null));drawMos()}
+function drawMos(){
+  mosCtx.fillStyle='#06060e';mosCtx.fillRect(0,0,mosCnv.width,mosCnv.height);
+  for(let r=0;r<GRID;r++){for(let c=0;c<GRID;c++){
+    if(mosGrid[r][c]){mosCtx.fillStyle=mosGrid[r][c];mosCtx.fillRect(c*CELL+1,r*CELL+1,CELL-2,CELL-2)}
+  }}
+  // Grid lines
+  mosCtx.strokeStyle='rgba(201,168,76,0.1)';mosCtx.lineWidth=.5;
+  for(let i=0;i<=GRID;i++){
+    mosCtx.beginPath();mosCtx.moveTo(i*CELL,0);mosCtx.lineTo(i*CELL,mosCnv.height);mosCtx.stroke();
+    mosCtx.beginPath();mosCtx.moveTo(0,i*CELL);mosCtx.lineTo(mosCnv.width,i*CELL);mosCtx.stroke();
+  }
+}
+function paintMos(e){
+  const rect=mosCnv.getBoundingClientRect();
+  const scaleX=mosCnv.width/rect.width,scaleY=mosCnv.height/rect.height;
+  const x=Math.floor((e.clientX-rect.left)*scaleX/CELL);
+  const y=Math.floor((e.clientY-rect.top)*scaleY/CELL);
+  const sz=parseInt(document.getElementById('mos-size').value);
+  for(let dr=0;dr<sz;dr++)for(let dc=0;dc<sz;dc++){
+    const nr=y+dr,nc=x+dc;
+    if(nr>=0&&nr<GRID&&nc>=0&&nc<GRID)mosGrid[nr][nc]=mosSel;
+  }
+  drawMos();
+}
+mosCnv.addEventListener('mousedown',e=>{mosDown=true;paintMos(e)});
+mosCnv.addEventListener('mousemove',e=>{if(mosDown)paintMos(e)});
+mosCnv.addEventListener('mouseup',()=>mosDown=false);
+mosCnv.addEventListener('mouseleave',()=>mosDown=false);
+mosCnv.addEventListener('touchstart',e=>{mosDown=true;paintMos(e.touches[0]);e.preventDefault()},{passive:false});
+mosCnv.addEventListener('touchmove',e=>{paintMos(e.touches[0]);e.preventDefault()},{passive:false});
+mosCnv.addEventListener('touchend',()=>mosDown=false);
+
+function clearMosaic(){initMosGrid()}
+function saveMosaic(){const a=document.createElement('a');a.download='mozaiku-im.png';a.href=mosCnv.toDataURL();a.click()}
+
+const mosPalWrap=document.getElementById('mos-pal');
+mosPal.forEach(c=>{
+  const s=document.createElement('div');s.className='msw';s.style.background=c;
+  if(c===mosSel)s.classList.add('sel');
+  s.addEventListener('click',()=>{mosSel=c;document.querySelectorAll('.msw').forEach(x=>x.classList.remove('sel'));s.classList.add('sel')});
+  mosPalWrap.appendChild(s);
+});
+initMosGrid();
+
+// ═══════════════════════════════════════
+// MEMORY GAME
+// ═══════════════════════════════════════
+const memPatterns=[
+  `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" fill="none" stroke="#c9a84c" stroke-width="2"/><circle cx="50" cy="50" r="25" fill="none" stroke="#e63946" stroke-width="2"/><circle cx="50" cy="50" r="10" fill="#c9a84c"/><line x1="50" y1="10" x2="50" y2="90" stroke="#c9a84c" stroke-width="1"/><line x1="10" y1="50" x2="90" y2="50" stroke="#c9a84c" stroke-width="1"/></svg>`,
+  `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,10 90,90 10,90" fill="none" stroke="#2a9d8f" stroke-width="2"/><polygon points="50,90 90,10 10,10" fill="none" stroke="#2a9d8f" stroke-width="2"/><circle cx="50" cy="50" r="10" fill="#2a9d8f"/></svg>`,
+  `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect x="20" y="20" width="60" height="60" fill="none" stroke="#e76f51" stroke-width="2" transform="rotate(45 50 50)"/><rect x="30" y="30" width="40" height="40" fill="none" stroke="#e76f51" stroke-width="1.5" transform="rotate(45 50 50)"/><circle cx="50" cy="50" r="8" fill="#e76f51"/></svg>`,
+  `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${[0,45,90,135].map(a=>`<ellipse cx="50" cy="30" rx="8" ry="20" fill="#8338ec" transform="rotate(${a} 50 50)"/>`).join('')}<circle cx="50" cy="50" r="6" fill="#c77dff"/></svg>`,
+  `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${[0,60,120,180,240,300].map(a=>`<line x1="50" y1="50" x2="${50+40*Math.cos(a*Math.PI/180)}" y2="${50+40*Math.sin(a*Math.PI/180)}" stroke="#e9c46a" stroke-width="2"/>`).join('')}<circle cx="50" cy="50" r="36" fill="none" stroke="#e9c46a" stroke-width="1.5"/><circle cx="50" cy="50" r="7" fill="#e9c46a"/></svg>`,
+  `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${[0,45,90,135,180,225,270,315].map(a=>`<circle cx="${50+35*Math.cos(a*Math.PI/180)}" cy="${50+35*Math.sin(a*Math.PI/180)}" r="8" fill="none" stroke="#457b9d" stroke-width="2"/>`).join('')}<circle cx="50" cy="50" r="14" fill="none" stroke="#457b9d" stroke-width="2"/></svg>`,
+  `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${[0,30,60,90,120,150].map(a=>`<path d="M 50 50 Q ${50+40*Math.cos(a*Math.PI/180)} ${50+40*Math.sin(a*Math.PI/180)} ${50+30*Math.cos((a+15)*Math.PI/180)} ${50+30*Math.sin((a+15)*Math.PI/180)}" fill="#606c38" stroke="none"/>`).join('')}<circle cx="50" cy="50" r="10" fill="#81b29a"/></svg>`,
+  `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 15 L61 40 L88 40 L66 57 L74 82 L50 67 L26 82 L34 57 L12 40 L39 40 Z" fill="none" stroke="#d62828" stroke-width="2"/><circle cx="50" cy="50" r="10" fill="#d62828"/></svg>`,
+];
+
+let memCards=[],memFlipped=[],memSolved=[],memMoves=0,memLock=false;
+function initMemory(){
+  memFlipped=[];memSolved=[];memMoves=0;memLock=false;
+  document.getElementById('mem-win').style.display='none';
+  document.getElementById('mem-stat').textContent='— Kliko një kartolinë —';
+  const pairs=[...memPatterns,...memPatterns].sort(()=>Math.random()-.5);
+  const board=document.getElementById('mem-board');board.innerHTML='';
+  memCards=[];
+  pairs.forEach((svg,i)=>{
+    const card=document.createElement('div');card.className='mc';
+    card.innerHTML=`<div class="mc-in"><div class="mc-front"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${[0,45,90,135,180,225,270,315].map(a=>`<line x1="50" y1="50" x2="${50+30*Math.cos(a*Math.PI/180)}" y2="${50+30*Math.sin(a*Math.PI/180)}" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>`).join('')}<circle cx="50" cy="50" r="12" fill="none" stroke="rgba(201,168,76,0.4)" stroke-width="1.5"/><circle cx="50" cy="50" r="4" fill="#c9a84c"/></svg></div><div class="mc-back">${svg}</div></div>`;
+    card.dataset.idx=i;card.dataset.svgIdx=memPatterns.indexOf(svg);
+    card.addEventListener('click',()=>flipCard(card,i));
+    board.appendChild(card);memCards.push(card);
+  });
+}
+function flipCard(card,i){
+  if(memLock||card.classList.contains('fl')||memSolved.includes(i))return;
+  card.classList.add('fl');memFlipped.push({card,i});
+  if(memFlipped.length===2){
+    memMoves++;memLock=true;
+    const [a,b]=memFlipped;
+    const aIdx=parseInt(a.card.dataset.svgIdx),bIdx=parseInt(b.card.dataset.svgIdx);
+    if(aIdx===bIdx){
+      memSolved.push(a.i,b.i);memFlipped=[];memLock=false;
+      document.getElementById('mem-stat').textContent=`✓ Çift! Lëvizje: ${memMoves}`;
+      if(memSolved.length===16){setTimeout(()=>{document.getElementById('mem-win').style.display='block';document.getElementById('mem-stat').textContent=''},600)}
+    }else{
+      setTimeout(()=>{a.card.classList.remove('fl');b.card.classList.remove('fl');memFlipped=[];memLock=false;document.getElementById('mem-stat').textContent=`Lëvizje: ${memMoves} — Provo sëri!`},900);
+    }
+  }
+}
+initMemory();
+
+// ═══════════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════════
+const quizData=[
+  {q:'Çfarë do të thotë fjala "mandala" në sanskritishtë?',opts:['Rreth i shenjtë','Lule e bukur','Diell i artë','Gur i çmuar'],ans:0,exp:'Fjala "mandala" vjen nga sanskritishtja dhe do të thotë "rreth" ose "rreth i shenjtë".'},
+  {q:'Nga cilat materiale bëheshin mandalat e rërës tibetiane?',opts:['Rërë ngjyrë','Farëra lulesh','Pluhurin argjilor','Copëzat xhami'],ans:0,exp:'Murgjtë tibetianë krijonin mandalat nga rëra e ngjyrosur — art i madh i destinuar të shkatërrohej!'},
+  {q:'Cili qytetërim krijoi mandalat e para?',opts:['Kinezit','Indianët e lashtë','Egjiptianët','Romakët'],ans:1,exp:'Mandalat e para njihen në traditat hinduje të Indisë, mbi 2500 vjet më parë.'},
+  {q:'Çfarë janë copëzat e vogla të mozaikut quajtura?',opts:['Pixeli','Tesserae','Granula','Fragmenta'],ans:1,exp:'"Tesserae" (njëjës: tessera) është termi latin për copëzat individuale të mozaikut — guri, xhami ose qeramike.'},
+  {q:'Cila kishë ka mozaikun më të famshëm bizantin?',opts:['Katedralja Notre Dame','Shën Pjetri në Romë','Hagia Sofia','Basilika e Venecies'],ans:2,exp:'Hagia Sofia në Konstandinopojë (sot Stamboll) ka mozaikun e artë bizantine ndër më të mëdhenjtë dhe më të bukurit.'},
+  {q:'Si quhet arti islamik i modeleve gjeometrike komplekse?',opts:['Mozaiku','Arabeska','Kaligrafia','Miniatura'],ans:1,exp:'Arabeska është forma e artit islamik e bazuar në modele gjeometrike dhe bimore të ndërthurura.'},
+  {q:'Çfarë simbolizojnë mandalat në budizëm?',opts:['Forcat e natyrës','Universin dhe kozmosin','Të parët dhe familjen','Fuqinë ushtarake'],ans:1,exp:'Mandalat budiste janë simbole të universit dhe kozmos — ato paraqesin vizualisht botëkuptimin shpirtëror.'},
+];
+
+let qIdx=0,score=0,answered=false;
+function startQuiz(){
+  qIdx=0;score=0;answered=false;
+  document.getElementById('quiz-res').style.display='none';
+  document.getElementById('quiz-nxt').style.display='none';
+  showQ();
+}
+function showQ(){
+  if(qIdx>=quizData.length){showRes();return}
+  answered=false;
+  const d=quizData[qIdx];
+  document.getElementById('quiz-prog').textContent=`Pyetja ${qIdx+1} nga ${quizData.length}`;
+  document.getElementById('quiz-q').textContent=d.q;
+  document.getElementById('quiz-exp').textContent='';
+  document.getElementById('quiz-nxt').style.display='none';
+  const opts=document.getElementById('quiz-opts');opts.innerHTML='';
+  d.opts.forEach((o,i)=>{
+    const btn=document.createElement('button');btn.className='qo';btn.textContent=o;
+    btn.addEventListener('click',()=>{
+      if(answered)return;answered=true;
+      const correct=i===d.ans;
+      if(correct)score++;
+      document.querySelectorAll('.qo').forEach((b,bi)=>{
+        b.classList.add('reveal');
+        if(bi===d.ans)b.classList.add('ok');
+        else if(bi===i&&!correct)b.classList.add('no');
+      });
+      document.getElementById('quiz-exp').textContent=d.exp;
+      document.getElementById('quiz-nxt').style.display='inline-block';
+    });
+    opts.appendChild(btn);
+  });
+}
+function quizNext(){qIdx++;showQ()}
+function showRes(){
+  document.getElementById('quiz-q').textContent='';
+  document.getElementById('quiz-opts').innerHTML='';
+  document.getElementById('quiz-exp').textContent='';
+  document.getElementById('quiz-nxt').style.display='none';
+  document.getElementById('quiz-prog').textContent='';
+  const res=document.getElementById('quiz-res');res.style.display='block';
+  document.getElementById('res-num').textContent=score+'/'+quizData.length;
+  const msgs={7:'Perfekt! Je një ekspert i vërtetë!',6:'Shkëlqyeshëm! Njohuri të mëdha!',5:'Shumë mirë! Po mëson shpejt!',4:'Mirë! Vazhdo të mësosh!',3:'Jo keq! Ka ende shumë për zbuluar.',2:'Fillo nga fillimi — ka shumë anë interesante!',1:'Mos u dorëzo — arte e bukur të pret!',0:'Filloj udhëtimin tënd tani!'}
+  document.getElementById('res-msg').textContent=msgs[score]||msgs[0];
+}
+startQuiz();
+
+// ═══════════════════════════════════════
+// ADD REVEAL TO DYNAMIC ELEMENTS
+// ═══════════════════════════════════════
+setTimeout(()=>{
+  document.querySelectorAll('.tl-card').forEach(el=>obs.observe(el));
+},100);
+
+</script>
+</body>
+</html>
