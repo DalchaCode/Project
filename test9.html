@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VALET — Sandboxi i Fizikës</title>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100;0,300;0,700;0,900;1,300&family=Share+Tech+Mono&family=Cormorant+Garamond:ital,wght@1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #07070f;
+  --bg2: #0d0d1e;
+  --c1: #4dffdb;
+  --c2: #ff4d7e;
+  --c3: #ffe94d;
+  --c4: #a78bfa;
+  --c5: #60d0ff;
+  --c6: #ff9f43;
+  --border: rgba(77,255,219,0.15);
+  --text: #e8e8f0;
+  --muted: rgba(232,232,240,0.45);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Exo 2', sans-serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* CUSTOM CURSOR */
+#cursor {
+  position: fixed; top: 0; left: 0; width: 10px; height: 10px;
+  background: var(--c1); border-radius: 50%;
+  pointer-events: none; z-index: 9999;
+  transition: transform 0.1s, width 0.2s, height 0.2s;
+  mix-blend-mode: screen;
+  transform: translate(-50%, -50%);
+}
+#cursor-ring {
+  position: fixed; top: 0; left: 0; width: 36px; height: 36px;
+  border: 1.5px solid rgba(77,255,219,0.5); border-radius: 50%;
+  pointer-events: none; z-index: 9998;
+  transition: transform 0.08s linear, width 0.3s, height 0.3s;
+  transform: translate(-50%, -50%);
+}
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2.5rem; height: 60px;
+  background: rgba(7,7,15,0.9);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-size: 1.4rem; font-weight: 900; letter-spacing: 0.25em;
+  color: var(--c1); text-transform: uppercase;
+  font-family: 'Share Tech Mono', monospace;
+}
+.nav-logo span { color: var(--c2); }
+.nav-links { display: flex; gap: 0.2rem; }
+.nav-links a {
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em;
+  color: var(--muted); text-decoration: none; text-transform: uppercase;
+  padding: 0.4rem 0.75rem; border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+  font-family: 'Share Tech Mono', monospace;
+}
+.nav-links a:hover, .nav-links a.active {
+  color: var(--c1); background: rgba(77,255,219,0.1);
+}
+
+/* HERO */
+#hero {
+  position: relative; height: 100vh; display: flex;
+  align-items: center; justify-content: center; overflow: hidden;
+}
+#hero-canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+}
+.hero-content {
+  position: relative; z-index: 2; text-align: center; pointer-events: none;
+}
+.hero-eyebrow {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem; letter-spacing: 0.4em; color: var(--c1);
+  text-transform: uppercase; margin-bottom: 1rem;
+  opacity: 0; animation: fadeUp 1s 0.3s forwards;
+}
+.hero-title {
+  font-size: clamp(5rem, 15vw, 12rem); font-weight: 900;
+  line-height: 0.9; letter-spacing: -0.02em; text-transform: uppercase;
+  background: linear-gradient(135deg, #fff 30%, var(--c1) 65%, var(--c4) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  opacity: 0; animation: fadeUp 1s 0.5s forwards;
+}
+.hero-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-size: 1.4rem; color: var(--muted);
+  margin-top: 1rem;
+  opacity: 0; animation: fadeUp 1s 0.7s forwards;
+}
+.hero-scroll {
+  position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+  font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
+  letter-spacing: 0.3em; color: var(--muted); text-transform: uppercase;
+  opacity: 0; animation: fadeUp 1s 1.2s forwards;
+  display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
+}
+.scroll-line {
+  width: 1px; height: 50px;
+  background: linear-gradient(to bottom, var(--c1), transparent);
+  animation: pulse-line 2s ease-in-out infinite;
+}
+
+/* SECTION LAYOUT */
+.demo-section {
+  min-height: 100vh; display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
+  border-top: 1px solid var(--border);
+}
+.section-header {
+  padding: 3rem 3rem 1.5rem;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  flex-shrink: 0;
+}
+.section-number {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem; letter-spacing: 0.3em; color: var(--muted);
+  text-transform: uppercase;
+}
+.section-title-wrap { display: flex; flex-direction: column; gap: 0.2rem; }
+.section-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.35em; text-transform: uppercase;
+}
+.section-name {
+  font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900;
+  line-height: 1; text-transform: uppercase; letter-spacing: -0.01em;
+}
+.section-desc {
+  font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-size: 1rem; color: var(--muted); max-width: 320px; text-align: right;
+  line-height: 1.5;
+}
+
+.demo-body {
+  flex: 1; display: grid; grid-template-columns: 1fr 280px;
+  gap: 0; min-height: 0;
+}
+.canvas-wrap {
+  position: relative; background: #040410; overflow: hidden;
+}
+.canvas-wrap canvas {
+  width: 100%; height: 100%; display: block;
+}
+.controls-panel {
+  background: var(--bg2); border-left: 1px solid var(--border);
+  padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;
+  overflow-y: auto;
+}
+
+/* CONTROLS STYLING */
+.ctrl-group { display: flex; flex-direction: column; gap: 0.5rem; }
+.ctrl-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--muted);
+}
+.ctrl-slider {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 2px; background: rgba(255,255,255,0.1);
+  outline: none; border-radius: 1px; cursor: pointer;
+}
+.ctrl-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 14px; height: 14px;
+  border-radius: 50%; border: 2px solid var(--c1);
+  background: var(--bg2); cursor: pointer;
+  transition: transform 0.15s;
+}
+.ctrl-slider::-webkit-slider-thumb:hover { transform: scale(1.4); }
+.ctrl-val {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem; color: var(--c1); text-align: right;
+}
+
+.ctrl-btn {
+  width: 100%; padding: 0.6rem 1rem;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  background: transparent; border: 1px solid var(--border);
+  color: var(--text); cursor: pointer; border-radius: 4px;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.ctrl-btn:hover { background: rgba(77,255,219,0.1); border-color: var(--c1); color: var(--c1); }
+.ctrl-btn.active { background: rgba(77,255,219,0.2); border-color: var(--c1); color: var(--c1); }
+.ctrl-btn.danger:hover { background: rgba(255,77,126,0.15); border-color: var(--c2); color: var(--c2); }
+
+.data-readout {
+  font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
+  color: var(--muted); display: flex; flex-direction: column; gap: 0.3rem;
+  padding: 0.75rem; background: rgba(0,0,0,0.3);
+  border-radius: 4px; border: 1px solid var(--border);
+}
+.data-readout .dr-row { display: flex; justify-content: space-between; }
+.data-readout .dr-val { color: var(--c1); }
+
+.hint-text {
+  font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
+  letter-spacing: 0.1em; color: var(--muted); line-height: 1.6;
+  padding: 0.75rem; background: rgba(255,255,255,0.03);
+  border-radius: 4px; border-left: 2px solid var(--border);
+}
+
+/* COLOR ACCENTS PER SECTION */
+#s-varg .section-label, #s-varg .ctrl-val, #s-varg .dr-val { color: var(--c1); }
+#s-varg .ctrl-slider::-webkit-slider-thumb { border-color: var(--c1); }
+#s-vale .section-label, #s-vale .ctrl-val, #s-vale .dr-val { color: var(--c5); }
+#s-vale .ctrl-slider::-webkit-slider-thumb { border-color: var(--c5); }
+#s-rrjet .section-label, #s-rrjet .ctrl-val, #s-rrjet .dr-val { color: var(--c3); }
+#s-rrjet .ctrl-slider::-webkit-slider-thumb { border-color: var(--c3); }
+#s-grav .section-label, #s-grav .ctrl-val, #s-grav .dr-val { color: var(--c4); }
+#s-grav .ctrl-slider::-webkit-slider-thumb { border-color: var(--c4); }
+#s-grimc .section-label, #s-grimc .ctrl-val, #s-grimc .dr-val { color: var(--c2); }
+#s-grimc .ctrl-slider::-webkit-slider-thumb { border-color: var(--c2); }
+#s-teli .section-label, #s-teli .ctrl-val, #s-teli .dr-val { color: var(--c6); }
+#s-teli .ctrl-slider::-webkit-slider-thumb { border-color: var(--c6); }
+
+/* FOOTER */
+footer {
+  padding: 3rem; text-align: center; border-top: 1px solid var(--border);
+  font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
+  letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase;
+}
+footer span { color: var(--c1); }
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-line {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* GRID BG */
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(77,255,219,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(77,255,219,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* CANVAS OVERLAY LABELS */
+.canvas-hint {
+  position: absolute; bottom: 1rem; left: 1rem;
+  font-family: 'Share Tech Mono', monospace; font-size: 0.6rem;
+  letter-spacing: 0.15em; color: rgba(255,255,255,0.2);
+  text-transform: uppercase; pointer-events: none;
+}
+
+.divider { height: 1px; background: var(--border); margin: 0.25rem 0; }
+
+/* Range input focus */
+.ctrl-slider:focus { outline: none; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<nav>
+  <div class="nav-logo">VER<span>LET</span></div>
+  <div class="nav-links">
+    <a href="#s-varg">Varg</a>
+    <a href="#s-vale">Valë</a>
+    <a href="#s-rrjet">Rrjeta</a>
+    <a href="#s-grav">Graviteti</a>
+    <a href="#s-grimc">Grimcat</a>
+    <a href="#s-teli">Teli</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Integrimi i Verlet — Fizika Interaktive</div>
+    <div class="hero-title">VALET</div>
+    <div class="hero-sub">Lëvizja, kufizimi, kaosi — e gjitha në majat e gishtave</div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    zbulo
+  </div>
+</section>
+
+<!-- DEMO 1: VARG (ROPE) -->
+<section class="demo-section" id="s-varg">
+  <div class="section-header">
+    <div class="section-number">01 / 06</div>
+    <div class="section-title-wrap">
+      <div class="section-label" style="color:var(--c1)">Litar Fizik</div>
+      <div class="section-name" style="background:linear-gradient(90deg,#4dffdb,#4db8ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">VARG</div>
+    </div>
+    <div class="section-desc">Zvarrit pikat e litarit. Ndjeni tensionin dhe gravitetin duke luajtur drejtpërdrejt.</div>
+  </div>
+  <div class="demo-body">
+    <div class="canvas-wrap">
+      <canvas id="cv-varg"></canvas>
+      <div class="canvas-hint">kliko &amp; zvarrit për të luajtur</div>
+    </div>
+    <div class="controls-panel">
+      <div class="ctrl-group">
+        <div class="ctrl-label">Graviteti</div>
+        <input class="ctrl-slider" id="varg-grav" type="range" min="0" max="2000" value="800" step="10">
+        <div class="ctrl-val" id="varg-grav-val">800</div>
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label">Zbutja (Damping)</div>
+        <input class="ctrl-slider" id="varg-damp" type="range" min="950" max="999" value="988" step="1">
+        <div class="ctrl-val" id="varg-damp-val">0.988</div>
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label">Numri i Pikave</div>
+        <input class="ctrl-slider" id="varg-pts" type="range" min="5" max="60" value="30" step="1">
+        <div class="ctrl-val" id="varg-pts-val">30</div>
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label">Era (Wind)</div>
+        <input class="ctrl-slider" id="varg-wind" type="range" min="-500" max="500" value="0" step="10">
+        <div class="ctrl-val" id="varg-wind-val">0</div>
+      </div>
+      <div class="divider"></div>
+      <button class="ctrl-btn" id="varg-reset">↺ Rifillo</button>
+      <button class="ctrl-btn" id="varg-pin-end">📌 Pinozh Fundin</button>
+      <button class="ctrl-btn" id="varg-shake">⚡ Dridhe</button>
+      <div class="divider"></div>
+      <div class="data-readout">
+        <div class="dr-row"><span>Pikat:</span><span class="dr-val" id="varg-dr-pts">30</span></div>
+        <div class="dr-row"><span>Kufizimet:</span><span class="dr-val" id="varg-dr-con">29</span></div>
+        <div class="dr-row"><span>Iterime/f:</span><span class="dr-val">10</span></div>
+      </div>
+      <div class="hint-text">Integrimi i Verlet llogarit pozicionin e ri bazuar në lëvizjen e mëparshme, jo shpejtësinë.</div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO 2: VALE (WATER WAVES) -->
+<section class="demo-section" id="s-vale">
+  <div class="section-header">
+    <div class="section-number">02 / 06</div>
+    <div class="section-title-wrap">
+      <div class="section-label" style="color:var(--c5)">Valë Ujore</div>
+      <div class="section-name" style="background:linear-gradient(90deg,#60d0ff,#4dffdb);-webkit-background-clip:text;-webkit-text-fill-color:transparent">VALË</div>
+    </div>
+    <div class="section-desc">Kliko në ujë për të krijuar rrokullima. Shikoni si shpërndahen energjia dhe valët.</div>
+  </div>
+  <div class="demo-body">
+    <div class="canvas-wrap">
+      <canvas id="cv-vale"></canvas>
+      <div class="canvas-hint">kliko kudo në ujë</div>
+    </div>
+    <div class="controls-panel">
+      <div class="ctrl-group">
+        <div class="ctrl-label">Shpejtësia e Valës</div>
+        <input class="ctrl-slider" id="vale-speed" type="range" min="10" max="99" value="40" step="1" style="accent-color:var(--c5)">
+        <div class="ctrl-val" id="vale-speed-val" style="color:var(--c5)">40</div>
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label">Zbutja</div>
+        <input class="ctrl-slider" id="vale-damp" type="range" min="980" max="999" value="992" step="1">
+        <div class="ctrl-val" id="vale-damp-val">0.992</div>
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label">Amplituda e Pikimit</div>
+        <input class="ctrl-slider" id="vale-amp" type="range" min="10" max="200" value="80" step="5">
+        <div class="ctrl-val" id="vale-amp-val">80</div>
+      </div>
+      <div class="divider"></div>
+      <button class="ctrl-btn" id="vale-rain">🌧 Shi i Vazhdueshëm</button>
+      <button class="ctrl-btn" id="vale-storm">⛈ Stuhi</button>
+      <button class="ctrl-btn" id="vale-reset" class="danger">↺ Pastro</button>
+      <div class="divider"></div>
+      <div class="data-readout">
+        <div class="dr-row"><span>Pikat:</span><span class="dr-val" id="vale-dr-pts">-</span></div>
+        <div class="dr-row"><span>Max Lartësi:</span><span class="dr-val" id="vale-dr-max">0</span></div>
+        <div class="dr-row"><span>Energjia:</span><span class="dr-val" id="vale-dr-e">0</span></div>
+      </div>
+      <div class="hint-text">Ekuacioni i valës: h″ = c² · ∇²h. Çdo pikë ndikojnë fqinjët e tyre.</div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO 3: RRJETA (CLOTH) -->
+<section class="demo-section" id="s-rrjet">
+  <div class="section-header">
+    <div class="section-number">03 / 06</div>
+    <div class="section-title-wrap">
+      <div class="section-label" style="color:var(--c3)">Simulim Stofi</div>
+      <div class="section-name" style="background:linear-gradient(90deg,#ffe94d,#ff9f43);-webkit-background-clip:text;-webkit-text-fill-color:transparent">RRJETA</div>
+    </div>
+    <div class="section-desc">Zvarrit stofit. Kliko me të djathtë për të grisur lidhjet. Graviteti dhe era ndikojnë.</div>
+  </div>
+  <div class="demo-body">
+    <div class="canvas-wrap">
+      <canvas id="cv-rrjet"></canvas>
+      <div class="canvas-hint">kliko &amp; zvarrit · klik i djathtë = grij</div>
+    </div>
+    <div class="controls-panel">
+      <div class="ctrl-group">
+        <div class="ctrl-label">Graviteti</div>
+        <input class="ctrl-slider" id="rrjet-grav" type="range" min="0" max="2000" value="980" step="10">
+        <div class="ctrl-val" id="rrjet-grav-val">980</div>
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label">Rigjiditeti</div>
+        <input class="ctrl-slider" id="rrjet-stiff" type="range" min="1" max="15" value="5" step="1">
+        <div class="ctrl-val" id="rrjet-stiff-val">5</div>
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label">Era</div>
+        <input class="ctrl-slider" id="rrjet-wind" type="range" min="-800" max="800" value="0" step="20">
+        <div class="ctrl-val" id="rrjet-wind-val">0</div>
+      </div>
+      <div class="divider"></div>
+      <button class="ctrl-btn" id="rrjet-reset">↺ Stof i Ri</button>
+      <button class="ctrl-btn" id="rrjet-explode">💥 Shpërnda</button>
+      <button class="ctrl-btn" id="rrjet-color">🎨 Ngjyrë</button>
+      <div class="divider"></div>
+      <div class="data-readout">
+        <div class="dr-row"><span>Pikat Aktive:</span><span class="dr-val" id="rrjet-dr-pts">-</span></div>
+        <div class="dr-row"><span>Lidhje Aktive:</span><span class="dr-val" id="rrjet-dr-con">-</span></div>
+        <div class="dr-row"><span>Lidhje Grisura:</span><span class="dr-val" id="rrjet-dr-torn">0</span></div>
+      </div>
+      <div class="hint-text">Kufizimet e distancës mbajnë stofit të qëndrueshëm. Grisjeni atë duke zvarrritur me forcë.</div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO 4: GRAVITETI (N-BODY) -->
+<section class="demo-section" id="s-grav">
+  <div class="section-header">
+    <div class="section-number">04 / 06</div>
+    <div class="section-title-wrap">
+      <div class="section-label" style="color:var(--c4)">Trupat Qiellorë</div>
+      <div class="section-name" style="background:linear-gradient(90deg,#a78bfa,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent">GRAVITETI</div>
+    </div>
+    <div class="section-desc">Kliko për të shtuar planete. Tërhiqini me forcë për të dhënë shpejtësi fillestare.</div>
+  </div>
+  <div class="demo-body">
+    <div class="canvas-wrap">
+      <canvas id="cv-grav"></canvas>
+      <div class="canvas-hint">kliko = planet · zvarrit = shpejtësi · dyfish-klik = fshi</div>
+    </div>
+    <div class="controls-panel">
+      <div class="ctrl-group">
+        <div class="ctrl-label">Konstantja G</div>
+        <input class="ctrl-slider" id="grav-g" type="range" min="100" max="5000" value="1000" step="50">
+        <div class="ctrl-val" id="grav-g-val">1000</div>
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label">Masa e Planetit</div>
+        <input class="ctrl-slider" id="grav-mass" type="range" min="50" max="1000" value="200" step="10">
+        <div class="ctrl-val" id="grav-mass-val">200</div>
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label">Gjatësia e Śladeve</div>
+        <input class="ctrl-slider" id="grav-trail" type="range" min="20" max="300" value="120" step="10">
+        <div class="ctrl-val" id="grav-trail-val">120</div>
+      </div>
+      <div class="divider"></div>
+      <button class="ctrl-btn" id="grav-add-star">⭐ Shtoni Yll</button>
+      <button class="ctrl-btn" id="grav-add-hole">🕳 Vrimë e Zezë</button>
+      <button class="ctrl-btn" id="grav-clear">↺ Pastro</button>
+      <button class="ctrl-btn" id="grav-preset">🪐 Sistem Diellor</button>
+      <div class="divider"></div>
+      <div class="data-readout">
+        <div class="dr-row"><span>Trupat:</span><span class="dr-val" id="grav-dr-bodies">0</span></div>
+        <div class="dr-row"><span>Energjia Kinetike:</span><span class="dr-val" id="grav-dr-ke">0</span></div>
+        <div class="dr-row"><span>Pesha e Sistemit:</span><span class="dr-val" id="grav-dr-mass">0</span></div>
+      </div>
+      <div class="hint-text">Ligji i Newtonit: F = G·m₁·m₂/r². Integrimi i Verlet ruaj saktësinë numerike.</div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO 5: GRIMCAT (PARTICLES) -->
+<section class="demo-section" id="s-grimc">
+  <div class="section-header">
+    <div class="section-number">05 / 06</div>
+    <div class="section-title-wrap">
+      <div class="section-label" style="color:var(--c2)">Sistemi i Grimcave</div>
+      <div class="section-name" style="background:linear-gradient(90deg,#ff4d7e,#ff8f4d);-webkit-background-clip:text;-webkit-text-fill-color:transparent">GRIMCAT</div>
+    </div>
+    <div class="section-desc">Miu tërheq ose repëzon grimcat. Kliko për shpërthim. Grilë pengesash.</div>
+  </div>
+  <div class="demo-body">
+    <div class="canvas-wrap">
+      <canvas id="cv-grimc"></canvas>
+      <div class="canvas-hint">lëviz miun · kliko = shpërthim</div>
+    </div>
+    <div class="controls-panel">
+      <div class="ctrl-group">
+        <div class="ctrl-label">Numri i Grimcave</div>
+        <input class="ctrl-slider" id="grimc-num" type="range" min="20" max="400" value="150" step="10">
+        <div class="ctrl-val" id="grimc-num-val">150</div>
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label">Forca e Miut</div>
+        <input class="ctrl-slider" id="grimc-force" type="range" min="-5000" max="5000" value="2000" step="100">
+        <div class="ctrl-val" id="grimc-force-val">2000</div>
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label">Graviteti</div>
+        <input class="ctrl-slider" id="grimc-grav" type="range" min="0" max="1000" value="200" step="10">
+        <div class="ctrl-val" id="grimc-grav-val">200</div>
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label">Madhësia</div>
+        <input class="ctrl-slider" id="grimc-size" type="range" min="2" max="12" value="4" step="1">
+        <div class="ctrl-val" id="grimc-size-val">4</div>
+      </div>
+      <div class="divider"></div>
+      <button class="ctrl-btn" id="grimc-reset">↺ Rindërtoji</button>
+      <button class="ctrl-btn" id="grimc-rainbow">🌈 Modaliteti Rainbow</button>
+      <button class="ctrl-btn" id="grimc-tornado">🌀 Tornado</button>
+      <div class="divider"></div>
+      <div class="data-readout">
+        <div class="dr-row"><span>Grimcat aktive:</span><span class="dr-val" id="grimc-dr-num">150</span></div>
+        <div class="dr-row"><span>Shpejtësia mesatare:</span><span class="dr-val" id="grimc-dr-spd">0</span></div>
+        <div class="dr-row"><span>Prekjet:</span><span class="dr-val" id="grimc-dr-col">0</span></div>
+      </div>
+      <div class="hint-text">Grimcat kufëzojnë shpejtësinë me damping. Tërhiqni me forcën e miut për të eksploruar dinamikën.</div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO 6: TELI (STRING) -->
+<section class="demo-section" id="s-teli">
+  <div class="section-header">
+    <div class="section-number">06 / 06</div>
+    <div class="section-title-wrap">
+      <div class="section-label" style="color:var(--c6)">Teli Muzikor</div>
+      <div class="section-name" style="background:linear-gradient(90deg,#ff9f43,#ffd166);-webkit-background-clip:text;-webkit-text-fill-color:transparent">TELI</div>
+    </div>
+    <div class="section-desc">Kliko telun për ta shkulur. Shikoni valët qëndrore dhe harmonikët duke lëkundur.</div>
+  </div>
+  <div class="demo-body">
+    <div class="canvas-wrap">
+      <canvas id="cv-teli"></canvas>
+      <div class="canvas-hint">kliko telun · zvarrit për formë</div>
+    </div>
+    <div class="controls-panel">
+      <div class="ctrl-group">
+        <div class="ctrl-label">Tensioni</div>
+        <input class="ctrl-slider" id="teli-tens" type="range" min="100" max="2000" value="600" step="50">
+        <div class="ctrl-val" id="teli-tens-val">600</div>
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label">Zbutja</div>
+        <input class="ctrl-slider" id="teli-damp" type="range" min="950" max="999" value="992" step="1">
+        <div class="ctrl-val" id="teli-damp-val">0.992</div>
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label">Numri i Pikave</div>
+        <input class="ctrl-slider" id="teli-pts" type="range" min="20" max="200" value="100" step="10">
+        <div class="ctrl-val" id="teli-pts-val">100</div>
+      </div>
+      <div class="divider"></div>
+      <button class="ctrl-btn" id="teli-h1">♪ Harmoniku 1</button>
+      <button class="ctrl-btn" id="teli-h2">♪♪ Harmoniku 2</button>
+      <button class="ctrl-btn" id="teli-h3">♪♪♪ Harmoniku 3</button>
+      <button class="ctrl-btn" id="teli-chaos">🎲 Kaos</button>
+      <div class="divider"></div>
+      <div class="data-readout">
+        <div class="dr-row"><span>Max Amplituda:</span><span class="dr-val" id="teli-dr-amp">0</span></div>
+        <div class="dr-row"><span>Frekuenca:</span><span class="dr-val" id="teli-dr-freq">-</span></div>
+        <div class="dr-row"><span>Gjendja:</span><span class="dr-val" id="teli-dr-mode">-</span></div>
+      </div>
+      <div class="hint-text">Valët qëndrore formohen kur gjatësia e telit = n·λ/2. Çdo harmonik ka frekuencë 2× më të lartë.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>Verlet Integration — Loup Verlet, 1967</div>
+  <div style="margin-top:0.5rem">Ndërtuar me <span>Fizikë</span> + <span>JavaScript</span> · Shqip</div>
+</footer>
+
+<script>
+// ─────────────────────────────────────────────────────────
+// CURSOR
+// ─────────────────────────────────────────────────────────
+const cursor = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+function updateCursor() {
+  cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+  rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+  cursorRing.style.left = rx + 'px'; cursorRing.style.top = ry + 'px';
+  requestAnimationFrame(updateCursor);
+}
+updateCursor();
+document.querySelectorAll('button, a, input').forEach(el => {
+  el.addEventListener('mouseenter', () => { cursor.style.transform = 'translate(-50%,-50%) scale(2.5)'; });
+  el.addEventListener('mouseleave', () => { cursor.style.transform = 'translate(-50%,-50%) scale(1)'; });
+});
+
+// ─────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────
+function resizeCanvas(canvas) {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+}
+function lerp(a, b, t) { return a + (b - a) * t; }
+function hsl(h, s, l) { return `hsl(${h},${s}%,${l}%)`; }
+
+// ─────────────────────────────────────────────────────────
+// HERO ANIMATION
+// ─────────────────────────────────────────────────────────
+(function heroAnim() {
+  const canvas = document.getElementById('hero-canvas');
+  const ctx = canvas.getContext('2d');
+  function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Multiple Verlet ropes in hero
+  class HeroPoint {
+    constructor(x, y, pinned) {
+      this.x = x; this.y = y;
+      this.px = x; this.py = y;
+      this.pinned = pinned;
+    }
+    update(gx, gy, damp, dt) {
+      if (this.pinned) return;
+      const vx = (this.x - this.px) * damp;
+      const vy = (this.y - this.py) * damp;
+      this.px = this.x; this.py = this.y;
+      this.x += vx + gx * dt * dt;
+      this.y += vy + gy * dt * dt;
+    }
+  }
+
+  function makeRope(x1, y1, x2, y2, n) {
+    const pts = [];
+    for (let i = 0; i < n; i++) {
+      const t = i / (n - 1);
+      pts.push(new HeroPoint(lerp(x1, x2, t), lerp(y1, y2, t), i === 0));
+    }
+    return pts;
+  }
+
+  function constrainRope(pts, restLen, iters) {
+    for (let iter = 0; iter < iters; iter++) {
+      for (let i = 0; i < pts.length - 1; i++) {
+        const a = pts[i], b = pts[i + 1];
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
+        const diff = (dist - restLen) / dist * 0.5;
+        if (!a.pinned) { a.x += dx * diff; a.y += dy * diff; }
+        if (!b.pinned) { b.x -= dx * diff; b.y -= dy * diff; }
+      }
+    }
+  }
+
+  let ropes = [];
+  function initHeroRopes() {
+    ropes = [];
+    const W = canvas.width, H = canvas.height;
+    const colors = ['rgba(77,255,219,', 'rgba(167,139,250,', 'rgba(96,208,255,', 'rgba(255,77,126,', 'rgba(255,233,77,'];
+    for (let r = 0; r < 8; r++) {
+      const x1 = W * (r / 9 + 0.02);
+      const y1 = -20;
+      const n = 25 + Math.floor(Math.random() * 15);
+      const len = H * 0.6 + Math.random() * H * 0.4;
+      ropes.push({
+        pts: makeRope(x1, y1, x1 + (Math.random() - 0.5) * 80, y1 + len, n),
+        restLen: len / (n - 1),
+        color: colors[r % colors.length],
+        alpha: 0.15 + Math.random() * 0.25
+      });
+    }
+  }
+  initHeroRopes();
+  window.addEventListener('resize', initHeroRopes);
+
+  // Floating particles
+  const particles = Array.from({ length: 60 }, () => ({
+    x: Math.random() * innerWidth,
+    y: Math.random() * innerHeight,
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: -(Math.random() * 0.2 + 0.05),
+    r: Math.random() * 2 + 0.5,
+    alpha: Math.random() * 0.5 + 0.1,
+    hue: Math.random() * 60 + 160
+  }));
+
+  let heroMX = innerWidth / 2, heroMY = innerHeight / 2;
+  document.addEventListener('mousemove', e => { heroMX = e.clientX; heroMY = e.clientY; });
+
+  let animTime = 0;
+  function heroLoop() {
+    if (!document.getElementById('hero').getBoundingClientRect().bottom < 0) {
+      requestAnimationFrame(heroLoop);
+    }
+    const W = canvas.width, H = canvas.height;
+    ctx.fillStyle = 'rgba(7,7,15,0.25)';
+    ctx.fillRect(0, 0, W, H);
+
+    animTime += 0.016;
+
+    // Draw ropes
+    ropes.forEach((rope, ri) => {
+      const pts = rope.pts;
+      // Attract pin to mouse gently
+      pts[0].x += (heroMX * 0.3 + W * 0.1 * (ri / ropes.length) * 7 - pts[0].x) * 0.03;
+
+      for (let p of pts) p.update(0, 400, 0.985, 0.016);
+      constrainRope(pts, rope.restLen, 8);
+
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) {
+        const mp = i > 0 ? { x: (pts[i - 1].x + pts[i].x) / 2, y: (pts[i - 1].y + pts[i].y) / 2 } : pts[i];
+        ctx.quadraticCurveTo(pts[i - 1].x, pts[i - 1].y, mp.x, mp.y);
+      }
+      ctx.strokeStyle = rope.color + rope.alpha + ')';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Glow
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) {
+        const mp = { x: (pts[i - 1].x + pts[i].x) / 2, y: (pts[i - 1].y + pts[i].y) / 2 };
+        ctx.quadraticCurveTo(pts[i - 1].x, pts[i - 1].y, mp.x, mp.y);
+      }
+      ctx.strokeStyle = rope.color + (rope.alpha * 0.3) + ')';
+      ctx.lineWidth = 6;
+      ctx.stroke();
+    });
+
+    // Draw particles
+    particles.forEach(p => {
+      p.x += p.vx + Math.sin(animTime * 0.5 + p.y * 0.01) * 0.2;
+      p.y += p.vy;
+      if (p.y < -10) { p.y = H + 5; p.x = Math.random() * W; }
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${p.hue},80%,70%,${p.alpha})`;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(heroLoop);
+  }
+  heroLoop();
+})();
+
+
+// ─────────────────────────────────────────────────────────
+// DEMO 1: VARG (ROPE)
+// ─────────────────────────────────────────────────────────
+(function vargDemo() {
+  const canvas = document.getElementById('cv-varg');
+  const ctx = canvas.getContext('2d');
+  resizeCanvas(canvas);
+  window.addEventListener('resize', () => resizeCanvas(canvas));
+
+  let pts = [], constraints = [];
+  let gravity = 800, damping = 0.988, wind = 0, numPts = 30;
+  let dragging = null, dragDist = 0, pinEnd = false;
+  let tornCount = 0;
+
+  function makePt(x, y, pinned) {
+    return { x, y, px: x, py: y, pinned };
+  }
+
+  function init() {
+    pts = []; constraints = [];
+    const W = canvas.width, H = canvas.height;
+    const segLen = H * 0.5 / (numPts - 1);
+    for (let i = 0; i < numPts; i++) {
+      pts.push(makePt(W / 2, H * 0.15 + i * segLen, i === 0));
+    }
+    for (let i = 0; i < numPts - 1; i++) {
+      constraints.push({ a: i, b: i + 1, len: segLen });
+    }
+    if (pinEnd) pts[pts.length - 1].pinned = true;
+  }
+  init();
+
+  // Sliders
+  const gravSlider = document.getElementById('varg-grav');
+  const dampSlider = document.getElementById('varg-damp');
+  const ptsSlider = document.getElementById('varg-pts');
+  const windSlider = document.getElementById('varg-wind');
+  gravSlider.addEventListener('input', () => { gravity = +gravSlider.value; document.getElementById('varg-grav-val').textContent = gravity; });
+  dampSlider.addEventListener('input', () => { damping = dampSlider.value / 1000; document.getElementById('varg-damp-val').textContent = damping.toFixed(3); });
+  ptsSlider.addEventListener('input', () => { numPts = +ptsSlider.value; document.getElementById('varg-pts-val').textContent = numPts; document.getElementById('varg-dr-pts').textContent = numPts; document.getElementById('varg-dr-con').textContent = numPts - 1; init(); });
+  windSlider.addEventListener('input', () => { wind = +windSlider.value; document.getElementById('varg-wind-val').textContent = wind; });
+  document.getElementById('varg-reset').addEventListener('click', init);
+  document.getElementById('varg-pin-end').addEventListener('click', () => { pinEnd = !pinEnd; document.getElementById('varg-pin-end').textContent = pinEnd ? '📌 Hiq Pin' : '📌 Pinozh Fundin'; init(); });
+  document.getElementById('varg-shake').addEventListener('click', () => {
+    pts.forEach(p => { if (!p.pinned) { p.px += (Math.random() - 0.5) * 80; p.py += (Math.random() - 0.5) * 80; } });
+  });
+
+  // Mouse
+  let mouseDown = false, mouseX = 0, mouseY = 0;
+  canvas.addEventListener('mousedown', e => {
+    mouseDown = true;
+    const r = canvas.getBoundingClientRect();
+    mouseX = e.clientX - r.left; mouseY = e.clientY - r.top;
+    let best = null, bestD = 30;
+    pts.forEach((p, i) => {
+      if (p.pinned) return;
+      const d = Math.hypot(p.x - mouseX, p.y - mouseY);
+      if (d < bestD) { bestD = d; best = i; }
+    });
+    dragging = best;
+  });
+  canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    mouseX = e.clientX - r.left; mouseY = e.clientY - r.top;
+  });
+  canvas.addEventListener('mouseup', () => { mouseDown = false; dragging = null; });
+
+  let frame = 0;
+  function loop() {
+    resizeCanvas(canvas);
+    const W = canvas.width, H = canvas.height;
+    ctx.fillStyle = '#040410';
+    ctx.fillRect(0, 0, W, H);
+
+    // Verlet update
+    const dt = 0.016;
+    pts.forEach((p, i) => {
+      if (p.pinned) return;
+      const vx = (p.x - p.px) * damping;
+      const vy = (p.y - p.py) * damping;
+      p.px = p.x; p.py = p.y;
+      p.x += vx + wind * dt * dt;
+      p.y += vy + gravity * dt * dt;
+    });
+
+    // Constraints
+    for (let iter = 0; iter < 10; iter++) {
+      constraints.forEach(c => {
+        const a = pts[c.a], b = pts[c.b];
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
+        const diff = (dist - c.len) / dist * 0.5;
+        if (!a.pinned) { a.x += dx * diff; a.y += dy * diff; }
+        if (!b.pinned) { b.x -= dx * diff; b.y -= dy * diff; }
+      });
+    }
+
+    // Drag
+    if (dragging !== null && mouseDown) {
+      pts[dragging].x += (mouseX - pts[dragging].x) * 0.4;
+      pts[dragging].y += (mouseY - pts[dragging].y) * 0.4;
+      pts[dragging].px = pts[dragging].x;
+      pts[dragging].py = pts[dragging].y;
+    }
+
+    // Collide with walls
+    pts.forEach(p => {
+      if (p.x < 5) p.x = 5;
+      if (p.x > W - 5) p.x = W - 5;
+      if (p.y > H - 5) { p.y = H - 5; p.py = p.y + (p.py - p.y) * 0.3; }
+    });
+
+    // Draw rope with gradient and glow
+    if (pts.length > 1) {
+      // Glow
+      ctx.save();
+      ctx.shadowColor = '#4dffdb';
+      ctx.shadowBlur = 12;
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) {
+        const mx = (pts[i - 1].x + pts[i].x) / 2;
+        const my = (pts[i - 1].y + pts[i].y) / 2;
+        ctx.quadraticCurveTo(pts[i - 1].x, pts[i - 1].y, mx, my);
+      }
+      const grad = ctx.createLinearGradient(pts[0].x, pts[0].y, pts[pts.length - 1].x, pts[pts.length - 1].y);
+      grad.addColorStop(0, '#a78bfa');
+      grad.addColorStop(0.5, '#4dffdb');
+      grad.addColorStop(1, '#4db8ff');
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+      ctx.restore();
+
+      // Draw beads
+      pts.forEach((p, i) => {
+        const t = i / (pts.length - 1);
+        const hue = lerp(260, 180, t);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.pinned ? 6 : 3, 0, Math.PI * 2);
+        ctx.fillStyle = p.pinned ? '#fff' : `hsla(${hue},100%,70%,0.7)`;
+        ctx.fill();
+      });
+    }
+
+    // Draw drag line
+    if (dragging !== null && mouseDown) {
+      ctx.beginPath();
+      ctx.arc(mouseX, mouseY, 12, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    frame++;
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+
+// ─────────────────────────────────────────────────────────
+// DEMO 2: VALE (WAVE)
+// ─────────────────────────────────────────────────────────
+(function valeDemo() {
+  const canvas = document.getElementById('cv-vale');
+  const ctx = canvas.getContext('2d');
+  resizeCanvas(canvas);
+
+  let COLS = 120, ROWS = 80;
+  let cur, prev, C2 = 0.016 * 0.016 * 40 * 40;
+  let dampVal = 0.992, amp = 80, rain = false, rainInterval = null;
+  let totalEnergy = 0;
+
+  function init() {
+    cur = new Float32Array(COLS * ROWS);
+    prev = new Float32Array(COLS * ROWS);
+  }
+  init();
+
+  function idx(c, r) { return r * COLS + c; }
+
+  function splash(cx, cy, a) {
+    const gc = Math.floor(cx / canvas.width * COLS);
+    const gr = Math.floor(cy / canvas.height * ROWS);
+    for (let dr = -3; dr <= 3; dr++) {
+      for (let dc = -3; dc <= 3; dc++) {
+        const d = Math.sqrt(dc * dc + dr * dr);
+        if (d > 3) continue;
+        const r = gr + dr, c = gc + dc;
+        if (r >= 0 && r < ROWS && c >= 0 && c < COLS) {
+          cur[idx(c, r)] += a * (1 - d / 3);
+        }
+      }
+    }
+  }
+
+  const speedSlider = document.getElementById('vale-speed');
+  const dampSlider = document.getElementById('vale-damp');
+  const ampSlider = document.getElementById('vale-amp');
+  speedSlider.addEventListener('input', () => { const s = +speedSlider.value; C2 = 0.016 * 0.016 * s * s; document.getElementById('vale-speed-val').textContent = s; });
+  dampSlider.addEventListener('input', () => { dampVal = dampSlider.value / 1000; document.getElementById('vale-damp-val').textContent = dampVal.toFixed(3); });
+  ampSlider.addEventListener('input', () => { amp = +ampSlider.value; document.getElementById('vale-amp-val').textContent = amp; });
+
+  canvas.addEventListener('click', e => {
+    const r = canvas.getBoundingClientRect();
+    splash(e.clientX - r.left, e.clientY - r.top, amp);
+  });
+  canvas.addEventListener('mousemove', e => {
+    if (e.buttons !== 1) return;
+    const r = canvas.getBoundingClientRect();
+    splash(e.clientX - r.left, e.clientY - r.top, amp * 0.3);
+  });
+
+  document.getElementById('vale-rain').addEventListener('click', () => {
+    rain = !rain;
+    document.getElementById('vale-rain').textContent = rain ? '☔ Ndalo Shin' : '🌧 Shi i Vazhdueshëm';
+  });
+  document.getElementById('vale-storm').addEventListener('click', () => {
+    for (let i = 0; i < 20; i++) {
+      setTimeout(() => splash(Math.random() * canvas.width, Math.random() * canvas.height, amp * 1.5), i * 80);
+    }
+  });
+  document.getElementById('vale-reset').addEventListener('click', init);
+
+  let frame = 0;
+  function loop() {
+    resizeCanvas(canvas);
+    const W = canvas.width, H = canvas.height;
+    const cw = W / COLS, ch = H / ROWS;
+
+    if (rain && frame % 8 === 0) {
+      splash(Math.random() * W, Math.random() * H, amp * 0.5);
+    }
+
+    // Wave propagation
+    const next = new Float32Array(COLS * ROWS);
+    totalEnergy = 0;
+    for (let r = 1; r < ROWS - 1; r++) {
+      for (let c = 1; c < COLS - 1; c++) {
+        const lap = cur[idx(c - 1, r)] + cur[idx(c + 1, r)] + cur[idx(c, r - 1)] + cur[idx(c, r + 1)] - 4 * cur[idx(c, r)];
+        next[idx(c, r)] = (2 * cur[idx(c, r)] - prev[idx(c, r)] + C2 * lap) * dampVal;
+        totalEnergy += Math.abs(next[idx(c, r)]);
+      }
+    }
+
+    prev = cur;
+    cur = next;
+
+    // Draw
+    let maxH = 0;
+    for (let i = 0; i < cur.length; i++) { if (Math.abs(cur[i]) > maxH) maxH = Math.abs(cur[i]); }
+
+    ctx.fillStyle = '#020818';
+    ctx.fillRect(0, 0, W, H);
+
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const h = cur[idx(c, r)];
+        const norm = h / (maxH || 1);
+        const x = c * cw, y = r * ch;
+
+        // Color based on wave height
+        let rgb;
+        if (norm > 0) {
+          rgb = `rgba(${Math.floor(lerp(20, 200, norm))},${Math.floor(lerp(100, 255, norm))},${Math.floor(lerp(180, 255, norm))},${0.6 + norm * 0.4})`;
+        } else {
+          rgb = `rgba(${Math.floor(lerp(20, 5, -norm))},${Math.floor(lerp(60, 15, -norm))},${Math.floor(lerp(120, 200, -norm))},${0.6 + (-norm) * 0.4})`;
+        }
+        ctx.fillStyle = rgb;
+        ctx.fillRect(x, y, cw + 1, ch + 1);
+      }
+    }
+
+    // Wave highlight lines
+    ctx.save();
+    ctx.globalAlpha = 0.3;
+    for (let r = 2; r < ROWS - 2; r += 3) {
+      ctx.beginPath();
+      for (let c = 0; c < COLS; c++) {
+        const h = cur[idx(c, r)];
+        const sx = c * cw + cw / 2;
+        const sy = r * ch + ch / 2 - h * 0.15;
+        c === 0 ? ctx.moveTo(sx, sy) : ctx.lineTo(sx, sy);
+      }
+      ctx.strokeStyle = 'rgba(200,240,255,0.5)';
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    document.getElementById('vale-dr-pts').textContent = COLS * ROWS;
+    document.getElementById('vale-dr-max').textContent = maxH.toFixed(1);
+    document.getElementById('vale-dr-e').textContent = totalEnergy.toFixed(0);
+
+    frame++;
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+
+// ─────────────────────────────────────────────────────────
+// DEMO 3: RRJETA (CLOTH)
+// ─────────────────────────────────────────────────────────
+(function rrjetDemo() {
+  const canvas = document.getElementById('cv-rrjet');
+  const ctx = canvas.getContext('2d');
+  resizeCanvas(canvas);
+
+  const COLS = 22, ROWS = 20;
+  let pts = [], conns = [], gravity = 980, windF = 0, stiff = 5;
+  let dragging = null, tornCount = 0, clothColor = 0;
+  const COLORS = ['#4dffdb', '#ffe94d', '#ff4d7e', '#a78bfa', '#60d0ff', '#ff9f43'];
+
+  function makePt(x, y, pinned) {
+    return { x, y, px: x, py: y, pinned };
+  }
+
+  function init() {
+    pts = []; conns = []; tornCount = 0;
+    const W = canvas.width, H = canvas.height;
+    const startX = W * 0.15, startY = H * 0.08;
+    const spacingX = (W * 0.7) / (COLS - 1);
+    const spacingY = (H * 0.65) / (ROWS - 1);
+
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const pinned = r === 0 && (c % 4 === 0 || c === COLS - 1);
+        pts.push(makePt(startX + c * spacingX, startY + r * spacingY, pinned));
+      }
+    }
+    // Structural constraints
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const i = r * COLS + c;
+        if (c < COLS - 1) conns.push({ a: i, b: i + 1, len: spacingX, active: true });
+        if (r < ROWS - 1) conns.push({ a: i, b: i + COLS, len: spacingY, active: true });
+      }
+    }
+    document.getElementById('rrjet-dr-pts').textContent = pts.length;
+    document.getElementById('rrjet-dr-con').textContent = conns.length;
+    document.getElementById('rrjet-dr-torn').textContent = 0;
+  }
+  init();
+  window.addEventListener('resize', init);
+
+  // Controls
+  document.getElementById('rrjet-grav').addEventListener('input', function() { gravity = +this.value; document.getElementById('rrjet-grav-val').textContent = gravity; });
+  document.getElementById('rrjet-stiff').addEventListener('input', function() { stiff = +this.value; document.getElementById('rrjet-stiff-val').textContent = stiff; });
+  document.getElementById('rrjet-wind').addEventListener('input', function() { windF = +this.value; document.getElementById('rrjet-wind-val').textContent = windF; });
+  document.getElementById('rrjet-reset').addEventListener('click', init);
+  document.getElementById('rrjet-explode').addEventListener('click', () => {
+    const cx = canvas.width / 2, cy = canvas.height / 2;
+    pts.forEach(p => {
+      if (p.pinned) return;
+      const dx = p.x - cx, dy = p.y - cy;
+      const d = Math.sqrt(dx * dx + dy * dy) + 1;
+      p.px = p.x - dx / d * 30;
+      p.py = p.y - dy / d * 30;
+    });
+  });
+  document.getElementById('rrjet-color').addEventListener('click', () => { clothColor = (clothColor + 1) % COLORS.length; });
+
+  // Mouse
+  let mouseX = 0, mouseY = 0, isDown = false;
+  canvas.addEventListener('mousedown', e => {
+    isDown = true;
+    const r = canvas.getBoundingClientRect();
+    mouseX = e.clientX - r.left; mouseY = e.clientY - r.top;
+    let best = null, bestD = 25;
+    if (e.button === 2) {
+      // Tear
+      conns.forEach(c => {
+        if (!c.active) return;
+        const a = pts[c.a], b = pts[c.b];
+        const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+        const d = Math.hypot(mx - mouseX, my - mouseY);
+        if (d < 25) { c.active = false; tornCount++; }
+      });
+    } else {
+      pts.forEach((p, i) => {
+        const d = Math.hypot(p.x - mouseX, p.y - mouseY);
+        if (d < bestD) { bestD = d; best = i; }
+      });
+      dragging = best;
+    }
+  });
+  canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    mouseX = e.clientX - r.left; mouseY = e.clientY - r.top;
+    if (isDown && e.button === 0 && dragging === null) {
+      // Tear while dragging with right
+    }
+    if (e.buttons === 2) {
+      conns.forEach(c => {
+        if (!c.active) return;
+        const a = pts[c.a], b = pts[c.b];
+        const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+        const d = Math.hypot(mx - mouseX, my - mouseY);
+        if (d < 18) { c.active = false; tornCount++; }
+      });
+    }
+  });
+  canvas.addEventListener('mouseup', () => { isDown = false; dragging = null; });
+  canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+  function loop() {
+    resizeCanvas(canvas);
+    const W = canvas.width, H = canvas.height;
+    ctx.fillStyle = '#030310';
+    ctx.fillRect(0, 0, W, H);
+
+    const dt = 0.016;
+    // Verlet
+    pts.forEach(p => {
+      if (p.pinned) return;
+      const vx = (p.x - p.px) * 0.985;
+      const vy = (p.y - p.py) * 0.985;
+      p.px = p.x; p.py = p.y;
+      p.x += vx + windF * dt * dt * (0.5 + Math.random() * 0.5);
+      p.y += vy + gravity * dt * dt;
+    });
+
+    // Constraints
+    const maxStretch = 1.6;
+    for (let iter = 0; iter < stiff; iter++) {
+      conns.forEach(c => {
+        if (!c.active) return;
+        const a = pts[c.a], b = pts[c.b];
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
+        if (dist > c.len * maxStretch) { c.active = false; tornCount++; return; }
+        const diff = (dist - c.len) / dist * 0.5;
+        if (!a.pinned) { a.x += dx * diff; a.y += dy * diff; }
+        if (!b.pinned) { b.x -= dx * diff; b.y -= dy * diff; }
+      });
+    }
+
+    // Floor
+    pts.forEach(p => {
+      if (p.x < 2) p.x = 2;
+      if (p.x > W - 2) p.x = W - 2;
+      if (p.y > H - 2) { p.y = H - 2; p.py = p.y + (p.py - p.y) * 0.2; }
+    });
+
+    // Drag
+    if (dragging !== null && isDown) {
+      pts[dragging].x += (mouseX - pts[dragging].x) * 0.35;
+      pts[dragging].y += (mouseY - pts[dragging].y) * 0.35;
+      pts[dragging].px = pts[dragging].x;
+      pts[dragging].py = pts[dragging].y;
+    }
+
+    // Draw cloth
+    const baseColor = COLORS[clothColor];
+    for (let r = 0; r < ROWS - 1; r++) {
+      for (let c = 0; c < COLS - 1; c++) {
+        const i = r * COLS + c;
+        const hConn = conns.find(cn => cn.a === i && cn.b === i + 1);
+        const vConn = conns.find(cn => cn.a === i && cn.b === i + COLS);
+        if (!hConn?.active && !vConn?.active) continue;
+
+        const p0 = pts[i], p1 = pts[i + 1], p2 = pts[i + COLS], p3 = pts[i + COLS + 1];
+        ctx.beginPath();
+        ctx.moveTo(p0.x, p0.y);
+        ctx.lineTo(p1.x, p1.y);
+        ctx.lineTo(p3.x, p3.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.closePath();
+        const alpha = 0.25 + Math.sin(r * 0.3 + c * 0.3) * 0.05;
+        ctx.fillStyle = baseColor + Math.floor(alpha * 255).toString(16).padStart(2, '0');
+        ctx.fill();
+      }
+    }
+
+    // Draw connections
+    ctx.lineWidth = 1;
+    conns.forEach(c => {
+      if (!c.active) return;
+      const a = pts[c.a], b = pts[c.b];
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.strokeStyle = baseColor + '60';
+      ctx.stroke();
+    });
+
+    // Draw pins
+    pts.forEach(p => {
+      if (p.pinned) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+      }
+    });
+
+    document.getElementById('rrjet-dr-pts').textContent = pts.length;
+    document.getElementById('rrjet-dr-con').textContent = conns.filter(c => c.active).length;
+    document.getElementById('rrjet-dr-torn').textContent = tornCount;
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+
+// ─────────────────────────────────────────────────────────
+// DEMO 4: GRAVITETI (N-BODY)
+// ─────────────────────────────────────────────────────────
+(function gravDemo() {
+  const canvas = document.getElementById('cv-grav');
+  const ctx = canvas.getContext('2d');
+  resizeCanvas(canvas);
+
+  let bodies = [];
+  let G = 1000, trailLen = 120, newMass = 200;
+  let dragStart = null, dragCurrent = null;
+
+  function makePlanet(x, y, vx, vy, m, color, special) {
+    return { x, y, px: x - vx * 0.016, py: y - vy * 0.016, m, color, trail: [], special };
+  }
+
+  function setPreset() {
+    const W = canvas.width, H = canvas.height;
+    bodies = [];
+    // Sun
+    bodies.push(makePlanet(W / 2, H / 2, 0, 0, 5000, '#ffe94d', 'star'));
+    // Planets
+    const planets = [
+      { r: 80, speed: 160, m: 50, col: '#60d0ff' },
+      { r: 140, speed: 120, m: 120, col: '#4dffdb' },
+      { r: 210, speed: 95, m: 80, col: '#ff9f43' },
+      { r: 280, speed: 75, m: 200, col: '#a78bfa' },
+    ];
+    planets.forEach(p => {
+      const angle = Math.random() * Math.PI * 2;
+      const vx = -Math.sin(angle) * p.speed;
+      const vy = Math.cos(angle) * p.speed;
+      bodies.push(makePlanet(W / 2 + Math.cos(angle) * p.r, H / 2 + Math.sin(angle) * p.r, vx, vy, p.m, p.col, null));
+    });
+  }
+  setPreset();
+
+  // Controls
+  document.getElementById('grav-g').addEventListener('input', function() { G = +this.value; document.getElementById('grav-g-val').textContent = G; });
+  document.getElementById('grav-mass').addEventListener('input', function() { newMass = +this.value; document.getElementById('grav-mass-val').textContent = newMass; });
+  document.getElementById('grav-trail').addEventListener('input', function() { trailLen = +this.value; document.getElementById('grav-trail-val').textContent = trailLen; });
+  document.getElementById('grav-add-star').addEventListener('click', () => {
+    const W = canvas.width, H = canvas.height;
+    bodies.push(makePlanet(W * 0.3 + Math.random() * W * 0.4, H * 0.3 + Math.random() * H * 0.4, (Math.random() - 0.5) * 80, (Math.random() - 0.5) * 80, 3000, '#ffe94d', 'star'));
+  });
+  document.getElementById('grav-add-hole').addEventListener('click', () => {
+    const W = canvas.width, H = canvas.height;
+    bodies.push(makePlanet(W * 0.2 + Math.random() * W * 0.6, H * 0.2 + Math.random() * H * 0.6, 0, 0, 15000, '#1a0030', 'hole'));
+  });
+  document.getElementById('grav-clear').addEventListener('click', () => { bodies = []; });
+  document.getElementById('grav-preset').addEventListener('click', setPreset);
+
+  // Mouse: drag to set velocity
+  canvas.addEventListener('mousedown', e => {
+    const r = canvas.getBoundingClientRect();
+    dragStart = { x: e.clientX - r.left, y: e.clientY - r.top };
+    dragCurrent = { ...dragStart };
+  });
+  canvas.addEventListener('mousemove', e => {
+    if (!dragStart) return;
+    const r = canvas.getBoundingClientRect();
+    dragCurrent = { x: e.clientX - r.left, y: e.clientY - r.top };
+  });
+  canvas.addEventListener('mouseup', e => {
+    if (!dragStart) return;
+    const r = canvas.getBoundingClientRect();
+    const ex = e.clientX - r.left, ey = e.clientY - r.top;
+    const vx = (ex - dragStart.x) * 3;
+    const vy = (ey - dragStart.y) * 3;
+    const hues = [200, 160, 280, 30, 330, 60];
+    const h = hues[bodies.length % hues.length];
+    bodies.push(makePlanet(dragStart.x, dragStart.y, vx, vy, newMass, `hsl(${h},90%,65%)`, null));
+    dragStart = null; dragCurrent = null;
+  });
+  canvas.addEventListener('dblclick', e => {
+    const r = canvas.getBoundingClientRect();
+    const mx = e.clientX - r.left, my = e.clientY - r.top;
+    let best = null, bestD = 30;
+    bodies.forEach((b, i) => {
+      const d = Math.hypot(b.x - mx, b.y - my);
+      if (d < bestD) { bestD = d; best = i; }
+    });
+    if (best !== null) bodies.splice(best, 1);
+  });
+
+  function loop() {
+    resizeCanvas(canvas);
+    const W = canvas.width, H = canvas.height;
+
+    ctx.fillStyle = 'rgba(3,3,15,0.15)';
+    ctx.fillRect(0, 0, W, H);
+
+    // Draw stars background
+    ctx.save();
+    ctx.fillStyle = '#040415';
+    // (already covered by fade)
+
+    const dt = 0.016;
+    // N-body gravity with Verlet
+    const forces = bodies.map(() => ({ fx: 0, fy: 0 }));
+    for (let i = 0; i < bodies.length; i++) {
+      for (let j = i + 1; j < bodies.length; j++) {
+        const a = bodies[i], b = bodies[j];
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const dist2 = dx * dx + dy * dy;
+        const dist = Math.sqrt(dist2) + 0.1;
+        const softDist = Math.max(dist, 15);
+        const f = G * a.m * b.m / (softDist * softDist);
+        forces[i].fx += f * dx / dist;
+        forces[i].fy += f * dy / dist;
+        forces[j].fx -= f * dx / dist;
+        forces[j].fy -= f * dy / dist;
+      }
+    }
+
+    bodies.forEach((b, i) => {
+      const ax = forces[i].fx / b.m;
+      const ay = forces[i].fy / b.m;
+      const vx = (b.x - b.px);
+      const vy = (b.y - b.py);
+      b.trail.push({ x: b.x, y: b.y });
+      if (b.trail.length > trailLen) b.trail.shift();
+      b.px = b.x; b.py = b.y;
+      b.x += vx + ax * dt * dt;
+      b.y += vy + ay * dt * dt;
+    });
+
+    // Draw trails
+    bodies.forEach(b => {
+      if (b.trail.length < 2) return;
+      ctx.beginPath();
+      ctx.moveTo(b.trail[0].x, b.trail[0].y);
+      for (let i = 1; i < b.trail.length; i++) {
+        ctx.lineTo(b.trail[i].x, b.trail[i].y);
+      }
+      ctx.strokeStyle = b.color + '55';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    });
+
+    // Draw bodies
+    bodies.forEach(b => {
+      const r = Math.cbrt(b.m) * 0.8;
+      if (b.special === 'hole') {
+        // Black hole
+        const grad = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, r * 3);
+        grad.addColorStop(0, '#000');
+        grad.addColorStop(0.5, '#2a0050');
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, r * 3, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+        // Ring
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, r * 1.5, 0, Math.PI * 2);
+        ctx.strokeStyle = '#c084fc';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      } else if (b.special === 'star') {
+        const grad = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, r * 4);
+        grad.addColorStop(0, '#fff');
+        grad.addColorStop(0.2, '#ffe94d');
+        grad.addColorStop(0.6, '#ff9f43aa');
+        grad.addColorStop(1, 'transparent');
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, r * 4, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+      } else {
+        ctx.save();
+        ctx.shadowColor = b.color;
+        ctx.shadowBlur = 15;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = b.color;
+        ctx.fill();
+        ctx.restore();
+      }
+    });
+
+    // Draw drag arrow
+    if (dragStart && dragCurrent) {
+      ctx.beginPath();
+      ctx.arc(dragStart.x, dragStart.y, 8, 0, Math.PI * 2);
+      ctx.strokeStyle = '#fff6';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(dragStart.x, dragStart.y);
+      ctx.lineTo(dragCurrent.x, dragCurrent.y);
+      ctx.strokeStyle = '#ffe94d99';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 5]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    let totalKE = 0, totalMass = 0;
+    bodies.forEach(b => {
+      const vx = b.x - b.px, vy = b.y - b.py;
+      totalKE += 0.5 * b.m * (vx * vx + vy * vy) / 0.016 / 0.016;
+      totalMass += b.m;
+    });
+    document.getElementById('grav-dr-bodies').textContent = bodies.length;
+    document.getElementById('grav-dr-ke').textContent = totalKE.toFixed(0);
+    document.getElementById('grav-dr-mass').textContent = totalMass.toFixed(0);
+
+    requestAnimationFrame(loop);
+  }
+
+  // Static star field on initial bg
+  ctx.fillStyle = '#030310';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  for (let i = 0; i < 200; i++) {
+    ctx.beginPath();
+    ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 1.2, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.5 + 0.1})`;
+    ctx.fill();
+  }
+  loop();
+})();
+
+
+// ─────────────────────────────────────────────────────────
+// DEMO 5: GRIMCAT (PARTICLES)
+// ─────────────────────────────────────────────────────────
+(function grimcDemo() {
+  const canvas = document.getElementById('cv-grimc');
+  const ctx = canvas.getContext('2d');
+  resizeCanvas(canvas);
+
+  let numParticles = 150, mouseForce = 2000, gravForce = 200, pSize = 4;
+  let particles = [];
+  let mouseX = -9999, mouseY = -9999;
+  let rainbowMode = false, tornadoMode = false;
+  let collisionCount = 0;
+  let frame = 0;
+
+  function makeParticle(x, y) {
+    const angle = Math.random() * Math.PI * 2;
+    const spd = Math.random() * 2 + 0.5;
+    const hue = Math.random() * 360;
+    return {
+      x: x ?? Math.random() * canvas.width,
+      y: y ?? Math.random() * canvas.height * 0.7,
+      px: 0, py: 0, r: pSize,
+      hue, m: 1
+    };
+  }
+
+  function init() {
+    particles = [];
+    for (let i = 0; i < numParticles; i++) {
+      const p = makeParticle();
+      p.px = p.x + (Math.random() - 0.5) * 2;
+      p.py = p.y;
+      particles.push(p);
+    }
+    collisionCount = 0;
+  }
+  init();
+
+  document.getElementById('grimc-num').addEventListener('input', function() {
+    numParticles = +this.value;
+    document.getElementById('grimc-num-val').textContent = numParticles;
+    while (particles.length < numParticles) { const p = makeParticle(); p.px = p.x; p.py = p.y; particles.push(p); }
+    while (particles.length > numParticles) particles.pop();
+  });
+  document.getElementById('grimc-force').addEventListener('input', function() { mouseForce = +this.value; document.getElementById('grimc-force-val').textContent = mouseForce; });
+  document.getElementById('grimc-grav').addEventListener('input', function() { gravForce = +this.value; document.getElementById('grimc-grav-val').textContent = gravForce; });
+  document.getElementById('grimc-size').addEventListener('input', function() { pSize = +this.value; document.getElementById('grimc-size-val').textContent = pSize; particles.forEach(p => p.r = pSize); });
+  document.getElementById('grimc-reset').addEventListener('click', init);
+  document.getElementById('grimc-rainbow').addEventListener('click', () => { rainbowMode = !rainbowMode; document.getElementById('grimc-rainbow').classList.toggle('active'); });
+  document.getElementById('grimc-tornado').addEventListener('click', () => { tornadoMode = !tornadoMode; document.getElementById('grimc-tornado').classList.toggle('active'); });
+
+  canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    mouseX = e.clientX - r.left; mouseY = e.clientY - r.top;
+  });
+  canvas.addEventListener('mouseleave', () => { mouseX = -9999; mouseY = -9999; });
+  canvas.addEventListener('click', e => {
+    const r = canvas.getBoundingClientRect();
+    const cx = e.clientX - r.left, cy = e.clientY - r.top;
+    particles.forEach(p => {
+      const dx = p.x - cx, dy = p.y - cy;
+      const d = Math.sqrt(dx * dx + dy * dy) + 1;
+      const f = Math.min(8000 / d, 200);
+      p.px = p.x - dx / d * f * 0.016;
+      p.py = p.y - dy / d * f * 0.016;
+    });
+  });
+
+  function loop() {
+    resizeCanvas(canvas);
+    const W = canvas.width, H = canvas.height;
+    ctx.fillStyle = 'rgba(5,3,15,0.25)';
+    ctx.fillRect(0, 0, W, H);
+
+    const dt = 0.016;
+    let totalSpd = 0;
+    let frameCollisions = 0;
+
+    frame++;
+
+    particles.forEach(p => {
+      // Mouse force
+      const dmx = mouseX - p.x, dmy = mouseY - p.y;
+      const dm = Math.sqrt(dmx * dmx + dmy * dmy) + 1;
+      const mf = mouseForce / (dm * dm);
+      let ax = dmx / dm * mf;
+      let ay = dmy / dm * mf + gravForce;
+
+      if (tornadoMode) {
+        // Circular force
+        const cx = W / 2, cy = H / 2;
+        const tx = p.y - cy, ty = cx - p.x;
+        const tm = Math.sqrt(tx * tx + ty * ty) + 1;
+        ax += tx / tm * 300;
+        ay += ty / tm * 300;
+      }
+
+      const vx = (p.x - p.px) * 0.982;
+      const vy = (p.y - p.py) * 0.982;
+      p.px = p.x; p.py = p.y;
+      p.x += vx + ax * dt * dt;
+      p.y += vy + ay * dt * dt;
+
+      // Bounce walls
+      if (p.x < p.r) { p.x = p.r; p.px = p.x + (p.x - p.px) * 0.3; }
+      if (p.x > W - p.r) { p.x = W - p.r; p.px = p.x + (p.x - p.px) * 0.3; }
+      if (p.y > H - p.r) { p.y = H - p.r; p.py = p.y + (p.y - p.py) * 0.3; }
+      if (p.y < p.r) { p.y = p.r; p.py = p.y + (p.y - p.py) * 0.3; }
+
+      totalSpd += Math.sqrt(vx * vx + vy * vy);
+      if (rainbowMode) p.hue = (p.hue + 0.5) % 360;
+    });
+
+    // Simple collision
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const a = particles[i], b = particles[j];
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        const minD = a.r + b.r;
+        if (d < minD && d > 0) {
+          const overlap = (minD - d) * 0.5;
+          const nx = dx / d, ny = dy / d;
+          a.x -= nx * overlap; a.y -= ny * overlap;
+          b.x += nx * overlap; b.y += ny * overlap;
+          frameCollisions++;
+        }
+      }
+    }
+    collisionCount += frameCollisions;
+
+    // Draw particles
+    particles.forEach(p => {
+      const vx = p.x - p.px, vy = p.y - p.py;
+      const spd = Math.sqrt(vx * vx + vy * vy);
+      const hue = rainbowMode ? p.hue : lerp(200, 360, Math.min(spd / 5, 1));
+      const lit = 50 + spd * 8;
+
+      ctx.save();
+      ctx.shadowColor = `hsl(${hue},100%,70%)`;
+      ctx.shadowBlur = pSize * 2;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `hsl(${hue},90%,${Math.min(lit, 80)}%)`;
+      ctx.fill();
+      ctx.restore();
+    });
+
+    // Mouse indicator
+    if (mouseX > 0) {
+      ctx.beginPath();
+      ctx.arc(mouseX, mouseY, 20, 0, Math.PI * 2);
+      ctx.strokeStyle = mouseForce > 0 ? 'rgba(77,255,219,0.3)' : 'rgba(255,77,126,0.3)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    document.getElementById('grimc-dr-num').textContent = particles.length;
+    document.getElementById('grimc-dr-spd').textContent = (totalSpd / particles.length / dt).toFixed(1);
+    document.getElementById('grimc-dr-col').textContent = collisionCount;
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+
+// ─────────────────────────────────────────────────────────
+// DEMO 6: TELI (STRING)
+// ─────────────────────────────────────────────────────────
+(function teliDemo() {
+  const canvas = document.getElementById('cv-teli');
+  const ctx = canvas.getContext('2d');
+  resizeCanvas(canvas);
+
+  let N = 100, tension = 600, dampVal = 0.992;
+  let pts = [];
+  let dragging = -1;
+  let frame = 0;
+  let modeLabel = '—';
+
+  function init() {
+    pts = [];
+    const W = canvas.width, H = canvas.height;
+    const y0 = H / 2;
+    for (let i = 0; i < N; i++) {
+      const x = lerp(W * 0.08, W * 0.92, i / (N - 1));
+      pts.push({ x, y: y0, py: y0, pinned: i === 0 || i === N - 1 });
+    }
+  }
+  init();
+  window.addEventListener('resize', init);
+
+  document.getElementById('teli-tens').addEventListener('input', function() { tension = +this.value; document.getElementById('teli-tens-val').textContent = tension; });
+  document.getElementById('teli-damp').addEventListener('input', function() { dampVal = this.value / 1000; document.getElementById('teli-damp-val').textContent = dampVal.toFixed(3); });
+  document.getElementById('teli-pts').addEventListener('input', function() { N = +this.value; document.getElementById('teli-pts-val').textContent = N; init(); });
+
+  function pluckHarmonic(n) {
+    const W = canvas.width, H = canvas.height;
+    const amplitude = H * 0.2;
+    for (let i = 0; i < N; i++) {
+      const t = i / (N - 1);
+      pts[i].y = H / 2 + amplitude * Math.sin(n * Math.PI * t);
+      pts[i].py = pts[i].y;
+    }
+    modeLabel = `Harmoniku ${n}`;
+  }
+
+  document.getElementById('teli-h1').addEventListener('click', () => pluckHarmonic(1));
+  document.getElementById('teli-h2').addEventListener('click', () => pluckHarmonic(2));
+  document.getElementById('teli-h3').addEventListener('click', () => pluckHarmonic(3));
+  document.getElementById('teli-chaos').addEventListener('click', () => {
+    const H = canvas.height;
+    for (let i = 1; i < N - 1; i++) {
+      pts[i].y = H / 2 + (Math.random() - 0.5) * H * 0.3;
+      pts[i].py = pts[i].y + (Math.random() - 0.5) * 2;
+    }
+    modeLabel = 'Kaos';
+  });
+
+  // Mouse
+  let mouseX = 0, mouseY = 0, isDown = false;
+  canvas.addEventListener('mousedown', e => {
+    isDown = true;
+    const r = canvas.getBoundingClientRect();
+    mouseX = e.clientX - r.left; mouseY = e.clientY - r.top;
+    // Find closest point
+    let best = -1, bestD = 30;
+    pts.forEach((p, i) => {
+      if (p.pinned) return;
+      const d = Math.hypot(p.x - mouseX, p.y - mouseY);
+      if (d < bestD) { bestD = d; best = i; }
+    });
+    dragging = best;
+    modeLabel = 'Shkulje';
+  });
+  canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    mouseX = e.clientX - r.left; mouseY = e.clientY - r.top;
+  });
+  canvas.addEventListener('mouseup', () => { isDown = false; dragging = -1; });
+
+  // Click to pluck
+  canvas.addEventListener('click', e => {
+    if (dragging >= 0) return;
+    const r = canvas.getBoundingClientRect();
+    const mx = e.clientX - r.left;
+    const H = canvas.height;
+    // Find closest x on string
+    let closest = 1;
+    let minD = Infinity;
+    for (let i = 1; i < N - 1; i++) {
+      const d = Math.abs(pts[i].x - mx);
+      if (d < minD) { minD = d; closest = i; }
+    }
+    pts[closest].y = H / 2 + (e.clientY - r.top - H / 2) * 1.5;
+    modeLabel = 'Shkulje';
+  });
+
+  function loop() {
+    resizeCanvas(canvas);
+    const W = canvas.width, H = canvas.height;
+    ctx.fillStyle = '#030310';
+    ctx.fillRect(0, 0, W, H);
+
+    // Draw grid lines
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,159,67,0.05)';
+    ctx.lineWidth = 1;
+    for (let i = 1; i < 8; i++) {
+      ctx.beginPath();
+      ctx.moveTo(0, H * i / 8);
+      ctx.lineTo(W, H * i / 8);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    const dt = 0.016;
+    // Wave equation (Verlet on string)
+    const newY = pts.map(p => p.y);
+    for (let i = 1; i < N - 1; i++) {
+      if (pts[i].pinned) continue;
+      const lap = pts[i - 1].y + pts[i + 1].y - 2 * pts[i].y;
+      newY[i] = (2 * pts[i].y - pts[i].py + tension * 0.0000016 * lap) * dampVal;
+      newY[i] = pts[i].y + (pts[i].y - pts[i].py) * (dampVal - 1) + tension * dt * dt * lap * 0.00001;
+    }
+
+    // Verlet wave: next = 2*cur - prev + c²*laplacian(cur)
+    const nextY = pts.map(p => p.y);
+    for (let i = 1; i < N - 1; i++) {
+      if (pts[i].pinned) continue;
+      const lap = pts[i - 1].y + pts[i + 1].y - 2 * pts[i].y;
+      const c2 = tension * dt * dt * 0.00008;
+      nextY[i] = (2 * pts[i].y - pts[i].py + c2 * lap) * dampVal;
+    }
+    for (let i = 1; i < N - 1; i++) {
+      if (pts[i].pinned) continue;
+      pts[i].py = pts[i].y;
+      pts[i].y = nextY[i];
+    }
+
+    // Drag
+    if (dragging >= 0 && isDown) {
+      pts[dragging].y += (mouseY - pts[dragging].y) * 0.5;
+      pts[dragging].py = pts[dragging].y;
+    }
+
+    // Clamp
+    pts.forEach(p => {
+      if (Math.abs(p.y - H / 2) > H * 0.45) p.y = H / 2 + Math.sign(p.y - H / 2) * H * 0.45;
+    });
+
+    // Draw string with gradient glow
+    let maxAmp = 0;
+    pts.forEach(p => { const a = Math.abs(p.y - H / 2); if (a > maxAmp) maxAmp = a; });
+
+    // Shadow/glow pass
+    ctx.save();
+    ctx.shadowColor = '#ff9f43';
+    ctx.shadowBlur = 20;
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) {
+      ctx.lineTo(pts[i].x, pts[i].y);
+    }
+    ctx.strokeStyle = 'rgba(255,159,67,0.4)';
+    ctx.lineWidth = 6;
+    ctx.stroke();
+    ctx.restore();
+
+    // Main string
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) {
+      const mx = (pts[i - 1].x + pts[i].x) / 2;
+      const my = (pts[i - 1].y + pts[i].y) / 2;
+      ctx.quadraticCurveTo(pts[i - 1].x, pts[i - 1].y, mx, my);
+    }
+    const grad = ctx.createLinearGradient(pts[0].x, 0, pts[N - 1].x, 0);
+    grad.addColorStop(0, '#ffd166');
+    grad.addColorStop(0.5, '#ff9f43');
+    grad.addColorStop(1, '#ffd166');
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    // Centerline reference
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, H / 2);
+    ctx.lineTo(pts[N - 1].x, H / 2);
+    ctx.strokeStyle = 'rgba(255,159,67,0.1)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 8]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Draw pin anchors
+    [pts[0], pts[N - 1]].forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+    });
+
+    // Wave amplitude meter
+    const barH = (maxAmp / (H * 0.45)) * (H * 0.4);
+    ctx.fillStyle = 'rgba(255,159,67,0.15)';
+    ctx.fillRect(W - 20, H / 2 - barH / 2, 8, barH);
+    ctx.fillStyle = '#ff9f43';
+    ctx.fillRect(W - 20, H / 2 - 2, 8, 4);
+
+    // Frequency estimate
+    let freq = '—';
+    if (maxAmp > 2) {
+      freq = (tension / N * 0.1).toFixed(1) + ' Hz';
+    }
+
+    document.getElementById('teli-dr-amp').textContent = maxAmp.toFixed(1);
+    document.getElementById('teli-dr-freq').textContent = freq;
+    document.getElementById('teli-dr-mode').textContent = modeLabel;
+
+    frame++;
+    requestAnimationFrame(loop);
+  }
+
+  loop();
+})();
+
+
+// ─────────────────────────────────────────────────────────
+// NAV ACTIVE STATE
+// ─────────────────────────────────────────────────────────
+const sections = document.querySelectorAll('section, .demo-section');
+const navLinks = document.querySelectorAll('.nav-links a');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = '#' + entry.target.id;
+      navLinks.forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === id);
+      });
+    }
+  });
+}, { threshold: 0.4 });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
